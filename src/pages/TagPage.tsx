@@ -1,37 +1,48 @@
 import { useEffect } from "react";
 import { useParams } from "react-router-dom";
-import { tags, gifs } from "@/data/mock-data";
 import GifCard from "@/components/GifCard";
 import NotFound from "./NotFound";
+import { useQuery } from "@tanstack/react-query";
+import { getGifsByTagSlug } from "@/services/api";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const TagPage = () => {
   const { slug } = useParams<{ slug: string }>();
 
-  const tag = tags.find((t) => t.slug === slug);
-  const filteredGifs = gifs.filter((gif) =>
-    gif.tags.some((t) => t.slug === slug)
-  );
+  const { data, isLoading, isError } = useQuery({
+    queryKey: ["tag", slug],
+    queryFn: () => getGifsByTagSlug(slug!),
+    enabled: !!slug,
+  });
+
+  const tag = data?.tag;
+  const filteredGifs = data?.gifs;
 
   useEffect(() => {
     if (tag) {
       document.title = `GIFs tagged #${tag.name} - GifHub.App`;
-      const metaDescriptionTag = document.querySelector('meta[name="description"]');
-      const description = `Find the best GIFs tagged with #${tag.name}. Explore funny, celebratory, and reaction GIFs for every occasion.`;
-
-      if (metaDescriptionTag) {
-        metaDescriptionTag.setAttribute("content", description);
-      } else {
-        const newMeta = document.createElement('meta');
-        newMeta.name = "description";
-        newMeta.content = description;
-        document.head.appendChild(newMeta);
-      }
-    } else {
+    } else if (isError) {
       document.title = "Tag Not Found - GifHub.App";
     }
-  }, [tag]);
+  }, [tag, isError]);
 
-  if (!tag) {
+  if (isLoading) {
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <section className="py-12 text-center">
+          <Skeleton className="h-10 w-1/2 mx-auto mb-2" />
+          <Skeleton className="h-6 w-2/3 mx-auto" />
+        </section>
+        <section className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+          {Array.from({ length: 8 }).map((_, i) => (
+            <Skeleton key={i} className="w-full h-auto aspect-square rounded-lg" />
+          ))}
+        </section>
+      </div>
+    );
+  }
+
+  if (isError || !tag) {
     return <NotFound />;
   }
 
@@ -45,7 +56,7 @@ const TagPage = () => {
       </section>
 
       <section>
-        {filteredGifs.length > 0 ? (
+        {filteredGifs && filteredGifs.length > 0 ? (
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             {filteredGifs.map((gif) => (
               <GifCard key={gif.id} gif={gif} />

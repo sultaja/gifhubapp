@@ -1,11 +1,12 @@
 import { useState, useEffect } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
-import { gifs } from "@/data/mock-data";
 import GifCard from "@/components/GifCard";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Search } from "lucide-react";
-import { Gif } from "@/types";
+import { useQuery } from "@tanstack/react-query";
+import { searchGifs } from "@/services/api";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const SearchPage = () => {
   const [searchParams] = useSearchParams();
@@ -13,32 +14,18 @@ const SearchPage = () => {
   const query = searchParams.get("q") || "";
 
   const [searchTerm, setSearchTerm] = useState(query);
-  const [filteredGifs, setFilteredGifs] = useState<Gif[]>([]);
+
+  const { data: filteredGifs, isLoading } = useQuery({
+    queryKey: ["searchGifs", query],
+    queryFn: () => searchGifs(query),
+    enabled: !!query,
+  });
 
   useEffect(() => {
+    setSearchTerm(query);
     if (query) {
-      const lowerCaseQuery = query.toLowerCase();
-      const results = gifs.filter(gif =>
-        gif.title.toLowerCase().includes(lowerCaseQuery) ||
-        gif.category.name.toLowerCase().includes(lowerCaseQuery) ||
-        gif.tags.some(tag => tag.name.toLowerCase().includes(lowerCaseQuery))
-      );
-      setFilteredGifs(results);
-      setSearchTerm(query);
       document.title = `Search results for "${query}" - GifHub.App`;
-      const metaDescriptionTag = document.querySelector('meta[name="description"]');
-      const description = `Search for high-quality GIFs related to "${query}". Find the perfect GIF for tech, marketing, and professional use.`;
-
-      if (metaDescriptionTag) {
-        metaDescriptionTag.setAttribute("content", description);
-      } else {
-        const newMeta = document.createElement('meta');
-        newMeta.name = "description";
-        newMeta.content = description;
-        document.head.appendChild(newMeta);
-      }
     } else {
-      setFilteredGifs([]);
       document.title = "Search - GifHub.App";
     }
   }, [query]);
@@ -74,11 +61,17 @@ const SearchPage = () => {
             <h2 className="text-2xl font-bold">
               Results for "{query}"
             </h2>
-            <p className="text-muted-foreground">{filteredGifs.length} GIF(s) found</p>
+            <p className="text-muted-foreground">{filteredGifs?.length || 0} GIF(s) found</p>
           </div>
         )}
 
-        {filteredGifs.length > 0 ? (
+        {isLoading ? (
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            {Array.from({ length: 8 }).map((_, i) => (
+              <Skeleton key={i} className="w-full h-auto aspect-square rounded-lg" />
+            ))}
+          </div>
+        ) : filteredGifs && filteredGifs.length > 0 ? (
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             {filteredGifs.map((gif) => (
               <GifCard key={gif.id} gif={gif} />

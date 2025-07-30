@@ -3,13 +3,24 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
-import { categories, gifs } from "@/data/mock-data";
 import GifCard from "@/components/GifCard";
-import { Gif } from "@/types";
+import { useQuery } from "@tanstack/react-query";
+import { getCategories, getFeaturedGifs } from "@/services/api";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const Index = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const navigate = useNavigate();
+
+  const { data: categories, isLoading: isLoadingCategories } = useQuery({
+    queryKey: ["categories"],
+    queryFn: getCategories,
+  });
+
+  const { data: gifs, isLoading: isLoadingGifs } = useQuery({
+    queryKey: ["featuredGifs"],
+    queryFn: () => getFeaturedGifs(12),
+  });
 
   const handleSearchSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -48,11 +59,15 @@ const Index = () => {
       <section className="py-12">
         <h2 className="text-2xl font-bold mb-6 text-center">Trending Categories</h2>
         <div className="flex flex-wrap justify-center gap-2">
-          {categories.map((category) => (
-            <Button key={category.id} variant="outline" asChild>
-              <Link to={`/category/${category.slug}`}>{category.name}</Link>
-            </Button>
-          ))}
+          {isLoadingCategories ? (
+            Array.from({ length: 8 }).map((_, i) => <Skeleton key={i} className="h-10 w-28 rounded-md" />)
+          ) : (
+            categories?.map((category) => (
+              <Button key={category.id} variant="outline" asChild>
+                <Link to={`/category/${category.slug}`}>{category.name}</Link>
+              </Button>
+            ))
+          )}
         </div>
       </section>
 
@@ -60,9 +75,13 @@ const Index = () => {
       <section className="py-12">
         <h2 className="text-2xl font-bold mb-6 text-center">Featured GIFs</h2>
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-          {gifs.map((gif) => (
-            <GifCard key={gif.id} gif={gif} />
-          ))}
+          {isLoadingGifs ? (
+            Array.from({ length: 12 }).map((_, i) => <Skeleton key={i} className="w-full h-auto aspect-square rounded-lg" />)
+          ) : (
+            gifs?.map((gif) => (
+              <GifCard key={gif.id} gif={gif} />
+            ))
+          )}
         </div>
       </section>
     </div>
