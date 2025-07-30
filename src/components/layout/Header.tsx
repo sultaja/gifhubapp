@@ -13,8 +13,10 @@ const Header = () => {
           </Link>
         </div>
         <div className="flex flex-1 items-center justify-end space-x-2">
-          <Button>
-            <Upload className="mr-2 h-4 w-4" /> Submit a GIF
+          <Button asChild>
+            <Link to="/submit">
+              <Upload className="mr-2 h-4 w-4" /> Submit a GIF
+            </Link>
           </Button>
           <Button variant="outline" size="icon" asChild>
             <Link to="/admin">

@@ -21,6 +21,7 @@ import CategoryPage from "./pages/CategoryPage";
 import TagPage from "./pages/TagPage";
 import SearchPage from "./pages/SearchPage";
 import GifPage from "./pages/GifPage";
+import SubmitGifPage from "./pages/SubmitGif";
 
 // Admin Pages
 import AdminDashboard from "./pages/admin/Dashboard";
@@ -44,6 +45,7 @@ const App = () => (
               <Route path="/" element={<Index />} />
               <Route path="/search" element={<SearchPage />} />
               <Route path="/gif/:slug" element={<GifPage />} />
+              <Route path="/submit" element={<SubmitGifPage />} />
               <Route path="/category/:slug" element={<CategoryPage />} />
               <Route path="/tag/:slug" element={<TagPage />} />
               <Route path="/about" element={<About />} />
