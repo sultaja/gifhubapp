@@ -1,9 +1,7 @@
 import { useState, useEffect } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { gifs } from "@/data/mock-data";
-import { Gif } from "@/types";
 import GifCard from "@/components/GifCard";
-import GifDetailModal from "@/components/GifDetailModal";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Search } from "lucide-react";
@@ -15,7 +13,6 @@ const SearchPage = () => {
 
   const [searchTerm, setSearchTerm] = useState(query);
   const [filteredGifs, setFilteredGifs] = useState<Gif[]>([]);
-  const [selectedGif, setSelectedGif] = useState<Gif | null>(null);
 
   useEffect(() => {
     if (query) {
@@ -28,6 +25,17 @@ const SearchPage = () => {
       setFilteredGifs(results);
       setSearchTerm(query);
       document.title = `Search results for "${query}" - GifHub.App`;
+      const metaDescriptionTag = document.querySelector('meta[name="description"]');
+      const description = `Search for high-quality GIFs related to "${query}". Find the perfect GIF for tech, marketing, and professional use.`;
+
+      if (metaDescriptionTag) {
+        metaDescriptionTag.setAttribute("content", description);
+      } else {
+        const newMeta = document.createElement('meta');
+        newMeta.name = "description";
+        newMeta.content = description;
+        document.head.appendChild(newMeta);
+      }
     } else {
       setFilteredGifs([]);
       document.title = "Search - GifHub.App";
@@ -39,14 +47,6 @@ const SearchPage = () => {
     if (searchTerm.trim()) {
       navigate(`/search?q=${encodeURIComponent(searchTerm.trim())}`);
     }
-  };
-
-  const handleGifClick = (gif: Gif) => {
-    setSelectedGif(gif);
-  };
-
-  const handleCloseModal = () => {
-    setSelectedGif(null);
   };
 
   return (
@@ -80,7 +80,7 @@ const SearchPage = () => {
         {filteredGifs.length > 0 ? (
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             {filteredGifs.map((gif) => (
-              <GifCard key={gif.id} gif={gif} onClick={handleGifClick} />
+              <GifCard key={gif.id} gif={gif} />
             ))}
           </div>
         ) : (
@@ -93,12 +93,6 @@ const SearchPage = () => {
           )
         )}
       </section>
-
-      <GifDetailModal
-        isOpen={!!selectedGif}
-        gif={selectedGif}
-        onClose={handleCloseModal}
-      />
     </div>
   );
 };

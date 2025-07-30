@@ -5,21 +5,11 @@ import { Search } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { categories, gifs } from "@/data/mock-data";
 import GifCard from "@/components/GifCard";
-import GifDetailModal from "@/components/GifDetailModal";
 import { Gif } from "@/types";
 
 const Index = () => {
-  const [selectedGif, setSelectedGif] = useState<Gif | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const navigate = useNavigate();
-
-  const handleGifClick = (gif: Gif) => {
-    setSelectedGif(gif);
-  };
-
-  const handleCloseModal = () => {
-    setSelectedGif(null);
-  };
 
   const handleSearchSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -71,16 +61,10 @@ const Index = () => {
         <h2 className="text-2xl font-bold mb-6 text-center">Featured GIFs</h2>
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
           {gifs.map((gif) => (
-            <GifCard key={gif.id} gif={gif} onClick={handleGifClick} />
+            <GifCard key={gif.id} gif={gif} />
           ))}
         </div>
       </section>
-
-      <GifDetailModal
-        isOpen={!!selectedGif}
-        gif={selectedGif}
-        onClose={handleCloseModal}
-      />
     </div>
   );
 };
