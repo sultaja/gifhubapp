@@ -60,7 +60,8 @@ const GifPage = () => {
     }
   };
 
-  const markdownLink = `![${gif.title}](${gif.url})`;
+  const pageUrl = window.location.href;
+  const markdownLink = `[![${gif.title}](${gif.url})](${pageUrl})`;
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -100,12 +101,9 @@ const GifPage = () => {
                 </div>
               </div>
               <div className="grid grid-cols-1 gap-2">
-                 <Button onClick={() => handleCopyLink(window.location.href, "Page")}>
-                    <LinkIcon className="mr-2 h-4 w-4" /> Copy Page URL
+                 <Button onClick={() => handleCopyLink(pageUrl, "GIF Link")}>
+                    <LinkIcon className="mr-2 h-4 w-4" /> Copy GIF Link
                   </Button>
-                <Button onClick={() => handleCopyLink(gif.url, "Direct GIF")}>
-                  <Copy className="mr-2 h-4 w-4" /> Copy GIF Link
-                </Button>
                 <Button onClick={() => handleCopyLink(markdownLink, "Markdown")}>
                   <Copy className="mr-2 h-4 w-4" /> Copy Markdown
                 </Button>
