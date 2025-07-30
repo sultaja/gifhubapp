@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Gif } from "@/types";
 import { Copy, Download, Link as LinkIcon } from "lucide-react";
 import { showSuccess, showError } from "@/utils/toast";
+import { Link } from "react-router-dom";
 
 interface GifDetailModalProps {
   gif: Gif | null;
@@ -54,9 +55,13 @@ const GifDetailModal = ({ gif, isOpen, onClose }: GifDetailModalProps) => {
           <DialogTitle>{gif.title}</DialogTitle>
           <DialogDescription>
             Category:{" "}
-            <a href={`/category/${gif.category.slug}`} className="hover:underline">
+            <Link
+              to={`/category/${gif.category.slug}`}
+              className="hover:underline"
+              onClick={onClose}
+            >
               {gif.category.name}
-            </a>
+            </Link>
           </DialogDescription>
         </DialogHeader>
         <div className="py-4">
@@ -69,9 +74,13 @@ const GifDetailModal = ({ gif, isOpen, onClose }: GifDetailModalProps) => {
         <div className="flex flex-wrap gap-2 mb-4">
           {gif.tags.map((tag) => (
             <Badge key={tag.id} variant="secondary">
-              <a href={`/tag/${tag.slug}`} className="hover:underline">
+              <Link
+                to={`/tag/${tag.slug}`}
+                className="hover:underline"
+                onClick={onClose}
+              >
                 #{tag.name}
-              </a>
+              </Link>
             </Badge>
           ))}
         </div>

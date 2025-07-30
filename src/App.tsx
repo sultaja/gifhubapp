@@ -12,6 +12,8 @@ import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsOfService from "./pages/TermsOfService";
 import Advertise from "./pages/Advertise";
 import NotFound from "./pages/NotFound";
+import CategoryPage from "./pages/CategoryPage";
+import TagPage from "./pages/TagPage";
 
 const queryClient = new QueryClient();
 
@@ -25,6 +27,8 @@ const App = () => (
           <Routes>
             <Route element={<MainLayout />}>
               <Route path="/" element={<Index />} />
+              <Route path="/category/:slug" element={<CategoryPage />} />
+              <Route path="/tag/:slug" element={<TagPage />} />
               <Route path="/about" element={<About />} />
               <Route path="/contact" element={<Contact />} />
               <Route path="/privacy-policy" element={<PrivacyPolicy />} />
