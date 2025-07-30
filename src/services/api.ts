@@ -2,23 +2,41 @@ import { supabase } from "@/integrations/supabase/client";
 import { Gif, Category, Tag } from "@/types";
 
 // The base query for fetching GIFs with their related category and tags
-const BASE_GIF_QUERY = "id, title, url, slug, category:categories!inner(id, name, slug), tags(id, name, slug)";
+const BASE_GIF_QUERY = "id, title, url, slug, category:categories(id, name, slug), tags(id, name, slug)";
 
-// Fetch all categories
+// --- CATEGORY API ---
 export const getCategories = async (): Promise<Category[]> => {
   const { data, error } = await supabase.from("categories").select("*").order("name", { ascending: true });
   if (error) throw new Error(error.message);
   return data || [];
 };
 
-// Fetch all tags
+export const createCategory = async (category: Omit<Category, 'id'>): Promise<Category> => {
+    const { data, error } = await supabase.from('categories').insert(category).select().single();
+    if (error) throw new Error(error.message);
+    return data;
+};
+
+export const updateCategory = async (id: string, updates: Partial<Category>): Promise<Category> => {
+    const { data, error } = await supabase.from('categories').update(updates).eq('id', id).select().single();
+    if (error) throw new Error(error.message);
+    return data;
+};
+
+export const deleteCategory = async (id: string) => {
+    const { error } = await supabase.from('categories').delete().eq('id', id);
+    if (error) throw new Error(error.message);
+};
+
+
+// --- TAG API ---
 export const getTags = async (): Promise<Tag[]> => {
     const { data, error } = await supabase.from("tags").select("*").order("name", { ascending: true });
     if (error) throw new Error(error.message);
     return data || [];
 };
 
-// Fetch all GIFs for admin
+// --- GIF API ---
 export const getGifs = async (): Promise<Gif[]> => {
   const { data, error } = await supabase
     .from("gifs")
@@ -29,7 +47,6 @@ export const getGifs = async (): Promise<Gif[]> => {
   return (data as any) || [];
 };
 
-// Fetch a limited number of featured GIFs
 export const getFeaturedGifs = async (limit = 12): Promise<Gif[]> => {
   const { data, error } = await supabase
     .from("gifs")
@@ -41,7 +58,6 @@ export const getFeaturedGifs = async (limit = 12): Promise<Gif[]> => {
   return (data as any) || [];
 };
 
-// Fetch a single GIF by its slug
 export const getGifBySlug = async (slug: string): Promise<Gif | null> => {
   const { data, error } = await supabase
     .from("gifs")
@@ -56,7 +72,6 @@ export const getGifBySlug = async (slug: string): Promise<Gif | null> => {
   return data as any;
 };
 
-// Fetch GIFs belonging to a specific category slug
 export const getGifsByCategorySlug = async (slug: string): Promise<{ category: Category | null, gifs: Gif[] }> => {
     const { data: category, error: categoryError } = await supabase.from('categories').select('*').eq('slug', slug).single();
     if (categoryError || !category) {
@@ -75,7 +90,6 @@ export const getGifsByCategorySlug = async (slug: string): Promise<{ category: C
     return { category, gifs: (gifs as any) || [] };
 };
 
-// Fetch GIFs associated with a specific tag slug
 export const getGifsByTagSlug = async (slug: string): Promise<{ tag: Tag | null, gifs: Gif[] }> => {
     const { data: tag, error: tagError } = await supabase.from('tags').select('*').eq('slug', slug).single();
     if (tagError || !tag) {
@@ -96,7 +110,6 @@ export const getGifsByTagSlug = async (slug: string): Promise<{ tag: Tag | null,
     return { tag, gifs };
 };
 
-// Search for GIFs by a query string
 export const searchGifs = async (query: string): Promise<Gif[]> => {
     const { data, error } = await supabase
         .from('gifs')
@@ -110,7 +123,7 @@ export const searchGifs = async (query: string): Promise<Gif[]> => {
     return (data as any) || [];
 };
 
-// Get stats for admin dashboard
+// --- STATS API ---
 export const getStats = async () => {
     const { count: gifsCount, error: gifsError } = await supabase.from('gifs').select('*', { count: 'exact', head: true });
     const { count: categoriesCount, error: categoriesError } = await supabase.from('categories').select('*', { count: 'exact', head: true });
