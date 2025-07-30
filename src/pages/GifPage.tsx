@@ -22,7 +22,7 @@ const GifPage = () => {
   useEffect(() => {
     if (gif) {
       document.title = `${gif.title} - GifHub.App`;
-      const metaDescription = `Download or share the "${gif.title}" GIF. Category: ${gif.category.name}. Tags: ${gif.tags.map(t => t.name).join(', ')}.`;
+      const metaDescription = `Download or share the "${gif.title}" GIF. Category: ${gif.category?.name}. Tags: ${gif.tags.map(t => t.name).join(', ')}.`;
       document.querySelector('meta[name="description"]')?.setAttribute("content", metaDescription);
     } else {
       document.title = "GIF Not Found - GifHub.App";
@@ -109,15 +109,17 @@ const GifPage = () => {
           <Card>
             <CardHeader>
               <CardTitle>{gif.title}</CardTitle>
-              <CardDescription>
-                In category:{" "}
-                <Link
-                  to={`/category/${gif.category.slug}`}
-                  className="hover:underline text-primary"
-                >
-                  {gif.category.name}
-                </Link>
-              </CardDescription>
+              {gif.category && (
+                <CardDescription>
+                  In category:{" "}
+                  <Link
+                    to={`/category/${gif.category.slug}`}
+                    className="hover:underline text-primary"
+                  >
+                    {gif.category.name}
+                  </Link>
+                </CardDescription>
+              )}
             </CardHeader>
             <CardContent>
               <div className="mb-4">

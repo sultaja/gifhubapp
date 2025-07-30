@@ -119,7 +119,7 @@ const AdminGifsPage = () => {
       header: "Category",
       cell: ({ row }) => {
         const category = row.original.category;
-        return <div>{category.name}</div>;
+        return <div>{category ? category.name : "Uncategorized"}</div>;
       },
     },
     {

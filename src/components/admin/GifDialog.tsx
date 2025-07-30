@@ -87,7 +87,7 @@ export function GifDialog({ children, gif, onSave, isSaving }: GifDialogProps) {
         title: gif.title,
         url: gif.url,
         slug: gif.slug,
-        category_id: gif.category.id,
+        category_id: gif.category?.id,
         tags: gif.tags.map(t => t.id),
       });
     } else {

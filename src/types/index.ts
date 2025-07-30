@@ -16,6 +16,6 @@ export interface Gif {
   url: string;
   slug: string;
   tags: Tag[];
-  category: Category;
+  category: Category | null;
   submittedBy?: string;
 }
