@@ -64,6 +64,76 @@ export const getGifs = async (): Promise<Gif[]> => {
   return (data as any) || [];
 };
 
+export const createGif = async (values: { title: string; url: string; slug: string; category_id: string; tags: string[] }) => {
+  const { data: gifData, error: gifError } = await supabase
+    .from("gifs")
+    .insert({
+      title: values.title,
+      url: values.url,
+      slug: values.slug,
+      category_id: values.category_id,
+    })
+    .select()
+    .single();
+
+  if (gifError) throw new Error(gifError.message);
+  if (!gifData) throw new Error("Failed to create GIF.");
+
+  const gifTags = values.tags.map(tagId => ({
+    gif_id: gifData.id,
+    tag_id: tagId,
+  }));
+
+  const { error: tagsError } = await supabase.from("gif_tags").insert(gifTags);
+
+  if (tagsError) {
+    await supabase.from("gifs").delete().eq("id", gifData.id);
+    throw new Error(`Failed to associate tags: ${tagsError.message}`);
+  }
+
+  return gifData;
+};
+
+export const updateGif = async (id: string, values: { title: string; url: string; slug: string; category_id: string; tags: string[] }) => {
+  const { data: gifData, error: gifError } = await supabase
+    .from("gifs")
+    .update({
+      title: values.title,
+      url: values.url,
+      slug: values.slug,
+      category_id: values.category_id,
+    })
+    .eq("id", id)
+    .select()
+    .single();
+
+  if (gifError) throw new Error(gifError.message);
+  if (!gifData) throw new Error("Failed to update GIF.");
+
+  const { error: deleteTagsError } = await supabase.from("gif_tags").delete().eq("gif_id", id);
+  if (deleteTagsError) throw new Error(`Failed to update tags (delete step): ${deleteTagsError.message}`);
+
+  const gifTags = values.tags.map(tagId => ({
+    gif_id: id,
+    tag_id: tagId,
+  }));
+
+  if (gifTags.length > 0) {
+      const { error: insertTagsError } = await supabase.from("gif_tags").insert(gifTags);
+      if (insertTagsError) throw new Error(`Failed to update tags (insert step): ${insertTagsError.message}`);
+  }
+
+  return gifData;
+};
+
+export const deleteGif = async (id: string) => {
+  const { error: tagsError } = await supabase.from("gif_tags").delete().eq("gif_id", id);
+  if (tagsError) throw new Error(`Failed to delete GIF tag associations: ${tagsError.message}`);
+
+  const { error: gifError } = await supabase.from("gifs").delete().eq("id", id);
+  if (gifError) throw new Error(`Failed to delete GIF: ${gifError.message}`);
+};
+
 export const getFeaturedGifs = async (limit = 12): Promise<Gif[]> => {
   const { data, error } = await supabase
     .from("gifs")
