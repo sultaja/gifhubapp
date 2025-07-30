@@ -1,4 +1,5 @@
-import { categories } from "@/data/mock-data";
+import { useQuery } from "@tanstack/react-query";
+import { getCategories } from "@/services/api";
 import { Category } from "@/types";
 import { DataTable } from "@/components/admin/DataTable";
 import { ColumnDef } from "@tanstack/react-table";
@@ -76,13 +77,25 @@ const columns: ColumnDef<Category>[] = [
 ];
 
 const AdminCategoriesPage = () => {
+  const { data: categories, isLoading } = useQuery({
+    queryKey: ["adminCategories"],
+    queryFn: getCategories,
+  });
+
+  const tableData = isLoading ? [] : categories || [];
+
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-3xl font-bold">Manage Categories</h1>
         <Button>Add New Category</Button>
       </div>
-      <DataTable columns={columns} data={categories} />
+      {isLoading && (
+        <div className="rounded-md border">
+          <div className="w-full text-center p-4">Loading Categories...</div>
+        </div>
+      )}
+      {!isLoading && <DataTable columns={columns} data={tableData} />}
     </div>
   );
 };

@@ -1,4 +1,5 @@
-import { gifs } from "@/data/mock-data";
+import { useQuery } from "@tanstack/react-query";
+import { getGifs } from "@/services/api";
 import { Gif } from "@/types";
 import { DataTable } from "@/components/admin/DataTable";
 import { ColumnDef } from "@tanstack/react-table";
@@ -13,6 +14,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const columns: ColumnDef<Gif>[] = [
   {
@@ -101,13 +103,25 @@ const columns: ColumnDef<Gif>[] = [
 ];
 
 const AdminGifsPage = () => {
+  const { data: gifs, isLoading } = useQuery({
+    queryKey: ["adminGifs"],
+    queryFn: getGifs,
+  });
+
+  const tableData = isLoading ? [] : gifs || [];
+
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-3xl font-bold">Manage GIFs</h1>
         <Button>Add New GIF</Button>
       </div>
-      <DataTable columns={columns} data={gifs} />
+      {isLoading && (
+        <div className="rounded-md border">
+          <div className="w-full text-center p-4">Loading GIFs...</div>
+        </div>
+      )}
+      {!isLoading && <DataTable columns={columns} data={tableData} />}
     </div>
   );
 };

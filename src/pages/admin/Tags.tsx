@@ -1,4 +1,5 @@
-import { tags } from "@/data/mock-data";
+import { useQuery } from "@tanstack/react-query";
+import { getTags } from "@/services/api";
 import { Tag } from "@/types";
 import { DataTable } from "@/components/admin/DataTable";
 import { ColumnDef } from "@tanstack/react-table";
@@ -76,13 +77,25 @@ const columns: ColumnDef<Tag>[] = [
 ];
 
 const AdminTagsPage = () => {
+  const { data: tags, isLoading } = useQuery({
+    queryKey: ["adminTags"],
+    queryFn: getTags,
+  });
+
+  const tableData = isLoading ? [] : tags || [];
+
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-3xl font-bold">Manage Tags</h1>
         <Button>Add New Tag</Button>
       </div>
-      <DataTable columns={columns} data={tags} />
+      {isLoading && (
+        <div className="rounded-md border">
+          <div className="w-full text-center p-4">Loading Tags...</div>
+        </div>
+      )}
+      {!isLoading && <DataTable columns={columns} data={tableData} />}
     </div>
   );
 };

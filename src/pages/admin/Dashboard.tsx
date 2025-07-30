@@ -1,8 +1,15 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { gifs, categories, tags } from "@/data/mock-data";
-import { GitFork, Tag } from "lucide-react";
+import { getStats } from "@/services/api";
+import { useQuery } from "@tanstack/react-query";
+import { GitFork, Tag, FolderKanban } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const Dashboard = () => {
+  const { data: stats, isLoading } = useQuery({
+    queryKey: ["adminStats"],
+    queryFn: getStats,
+  });
+
   return (
     <div>
       <h1 className="text-3xl font-bold mb-6">Dashboard</h1>
@@ -13,7 +20,7 @@ const Dashboard = () => {
             <GitFork className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{gifs.length}</div>
+            {isLoading ? <Skeleton className="h-8 w-1/4" /> : <div className="text-2xl font-bold">{stats?.gifsCount}</div>}
           </CardContent>
         </Card>
         <Card>
@@ -21,10 +28,10 @@ const Dashboard = () => {
             <CardTitle className="text-sm font-medium">
               Total Categories
             </CardTitle>
-            <GitFork className="h-4 w-4 text-muted-foreground" />
+            <FolderKanban className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{categories.length}</div>
+            {isLoading ? <Skeleton className="h-8 w-1/4" /> : <div className="text-2xl font-bold">{stats?.categoriesCount}</div>}
           </CardContent>
         </Card>
         <Card>
@@ -33,7 +40,7 @@ const Dashboard = () => {
             <Tag className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{tags.length}</div>
+            {isLoading ? <Skeleton className="h-8 w-1/4" /> : <div className="text-2xl font-bold">{stats?.tagsCount}</div>}
           </CardContent>
         </Card>
       </div>
