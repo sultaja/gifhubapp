@@ -36,6 +36,23 @@ export const getTags = async (): Promise<Tag[]> => {
     return data || [];
 };
 
+export const createTag = async (tag: Omit<Tag, 'id'>): Promise<Tag> => {
+    const { data, error } = await supabase.from('tags').insert(tag).select().single();
+    if (error) throw new Error(error.message);
+    return data;
+};
+
+export const updateTag = async (id: string, updates: Partial<Tag>): Promise<Tag> => {
+    const { data, error } = await supabase.from('tags').update(updates).eq('id', id).select().single();
+    if (error) throw new Error(error.message);
+    return data;
+};
+
+export const deleteTag = async (id: string) => {
+    const { error } = await supabase.from('tags').delete().eq('id', id);
+    if (error) throw new Error(error.message);
+};
+
 // --- GIF API ---
 export const getGifs = async (): Promise<Gif[]> => {
   const { data, error } = await supabase
