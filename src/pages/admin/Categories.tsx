@@ -26,13 +26,7 @@ import {
 } from "@/components/ui/alert-dialog"
 import { Checkbox } from "@/components/ui/checkbox";
 import { showSuccess, showError } from "@/utils/toast";
-import { CategoryDialog } from "@/components/admin/CategoryDialog";
-import * as z from "zod";
-
-const formSchema = z.object({
-  name: z.string().min(2),
-  slug: z.string().min(2),
-});
+import { CategoryDialog, CategoryFormValues } from "@/components/admin/CategoryDialog";
 
 const AdminCategoriesPage = () => {
   const queryClient = useQueryClient();
@@ -61,7 +55,7 @@ const AdminCategoriesPage = () => {
   });
 
   const updateMutation = useMutation({
-    mutationFn: ({ id, values }: { id: string, values: Partial<Category> }) => updateCategory(id, values),
+    mutationFn: ({ id, values }: { id: string, values: CategoryFormValues }) => updateCategory(id, values),
     ...mutationOptions,
     onSuccess: () => {
       mutationOptions.onSuccess();
@@ -78,7 +72,7 @@ const AdminCategoriesPage = () => {
     }
   });
 
-  const handleSave = (values: z.infer<typeof formSchema>, categoryId?: string) => {
+  const handleSave = (values: CategoryFormValues, categoryId?: string) => {
     if (categoryId) {
       updateMutation.mutate({ id: categoryId, values });
     } else {

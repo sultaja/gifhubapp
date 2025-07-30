@@ -33,6 +33,8 @@ const formSchema = z.object({
   }),
 });
 
+export type CategoryFormValues = z.infer<typeof formSchema>;
+
 interface CategoryDialogProps {
   children: React.ReactNode;
   category?: Category;

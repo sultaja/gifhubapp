@@ -26,13 +26,7 @@ import {
 } from "@/components/ui/alert-dialog"
 import { Checkbox } from "@/components/ui/checkbox";
 import { showSuccess, showError } from "@/utils/toast";
-import { TagDialog } from "@/components/admin/TagDialog";
-import * as z from "zod";
-
-const formSchema = z.object({
-  name: z.string().min(2),
-  slug: z.string().min(2),
-});
+import { TagDialog, TagFormValues } from "@/components/admin/TagDialog";
 
 const AdminTagsPage = () => {
   const queryClient = useQueryClient();
@@ -61,7 +55,7 @@ const AdminTagsPage = () => {
   });
 
   const updateMutation = useMutation({
-    mutationFn: ({ id, values }: { id: string, values: Partial<Tag> }) => updateTag(id, values),
+    mutationFn: ({ id, values }: { id: string, values: TagFormValues }) => updateTag(id, values),
     ...mutationOptions,
     onSuccess: () => {
       mutationOptions.onSuccess();
@@ -78,7 +72,7 @@ const AdminTagsPage = () => {
     }
   });
 
-  const handleSave = (values: z.infer<typeof formSchema>, tagId?: string) => {
+  const handleSave = (values: TagFormValues, tagId?: string) => {
     if (tagId) {
       updateMutation.mutate({ id: tagId, values });
     } else {

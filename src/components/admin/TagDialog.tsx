@@ -33,6 +33,8 @@ const formSchema = z.object({
   }),
 });
 
+export type TagFormValues = z.infer<typeof formSchema>;
+
 interface TagDialogProps {
   children: React.ReactNode;
   tag?: Tag;
