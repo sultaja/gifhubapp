@@ -14,6 +14,7 @@ import Advertise from "./pages/Advertise";
 import NotFound from "./pages/NotFound";
 import CategoryPage from "./pages/CategoryPage";
 import TagPage from "./pages/TagPage";
+import SearchPage from "./pages/SearchPage";
 
 const queryClient = new QueryClient();
 
@@ -27,6 +28,7 @@ const App = () => (
           <Routes>
             <Route element={<MainLayout />}>
               <Route path="/" element={<Index />} />
+              <Route path="/search" element={<SearchPage />} />
               <Route path="/category/:slug" element={<CategoryPage />} />
               <Route path="/tag/:slug" element={<TagPage />} />
               <Route path="/about" element={<About />} />

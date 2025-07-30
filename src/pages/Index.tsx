@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { categories, gifs } from "@/data/mock-data";
 import GifCard from "@/components/GifCard";
 import GifDetailModal from "@/components/GifDetailModal";
@@ -10,6 +10,8 @@ import { Gif } from "@/types";
 
 const Index = () => {
   const [selectedGif, setSelectedGif] = useState<Gif | null>(null);
+  const [searchTerm, setSearchTerm] = useState("");
+  const navigate = useNavigate();
 
   const handleGifClick = (gif: Gif) => {
     setSelectedGif(gif);
@@ -17,6 +19,13 @@ const Index = () => {
 
   const handleCloseModal = () => {
     setSelectedGif(null);
+  };
+
+  const handleSearchSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (searchTerm.trim()) {
+      navigate(`/search?q=${encodeURIComponent(searchTerm.trim())}`);
+    }
   };
 
   return (
@@ -30,11 +39,13 @@ const Index = () => {
           A sleek, ultra-fast, and highly-curated platform for discovering and sharing GIFs for the professional world.
         </p>
         <div className="max-w-xl mx-auto">
-          <form className="flex w-full items-center space-x-2">
+          <form onSubmit={handleSearchSubmit} className="flex w-full items-center space-x-2">
             <Input
               type="search"
               placeholder="Search by title, tag, or category..."
               className="flex-1"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
             />
             <Button type="submit" size="icon">
               <Search className="h-4 w-4" />
