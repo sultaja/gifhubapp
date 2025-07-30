@@ -5,6 +5,7 @@ import GifCard from "@/components/GifCard";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Search } from "lucide-react";
+import { Gif } from "@/types";
 
 const SearchPage = () => {
   const [searchParams] = useSearchParams();
