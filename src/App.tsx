@@ -4,7 +4,12 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ThemeProvider } from "@/components/ThemeProvider";
+
+// Layouts
 import MainLayout from "@/components/layout/MainLayout";
+import AdminLayout from "@/components/layout/AdminLayout";
+
+// Main Pages
 import Index from "./pages/Index";
 import About from "./pages/About";
 import Contact from "./pages/Contact";
@@ -17,6 +22,13 @@ import TagPage from "./pages/TagPage";
 import SearchPage from "./pages/SearchPage";
 import GifPage from "./pages/GifPage";
 
+// Admin Pages
+import AdminDashboard from "./pages/admin/Dashboard";
+import AdminGifsPage from "./pages/admin/Gifs";
+import AdminCategoriesPage from "./pages/admin/Categories";
+import AdminTagsPage from "./pages/admin/Tags";
+
+
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -27,6 +39,7 @@ const App = () => (
         <Sonner />
         <BrowserRouter>
           <Routes>
+            {/* Main Site Routes */}
             <Route element={<MainLayout />}>
               <Route path="/" element={<Index />} />
               <Route path="/search" element={<SearchPage />} />
@@ -38,8 +51,18 @@ const App = () => (
               <Route path="/privacy-policy" element={<PrivacyPolicy />} />
               <Route path="/terms-of-service" element={<TermsOfService />} />
               <Route path="/advertise" element={<Advertise />} />
-              <Route path="*" element={<NotFound />} />
             </Route>
+
+            {/* Admin Routes */}
+            <Route path="/admin" element={<AdminLayout />}>
+              <Route index element={<AdminDashboard />} />
+              <Route path="gifs" element={<AdminGifsPage />} />
+              <Route path="categories" element={<AdminCategoriesPage />} />
+              <Route path="tags" element={<AdminTagsPage />} />
+            </Route>
+
+            {/* Not Found Route */}
+            <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
       </TooltipProvider>

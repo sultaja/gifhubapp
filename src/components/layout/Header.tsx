@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ModeToggle } from "@/components/ModeToggle";
-import { Upload } from "lucide-react";
+import { Upload, Shield } from "lucide-react";
 
 const Header = () => {
   return (
@@ -15,6 +15,11 @@ const Header = () => {
         <div className="flex flex-1 items-center justify-end space-x-2">
           <Button>
             <Upload className="mr-2 h-4 w-4" /> Submit a GIF
+          </Button>
+          <Button variant="outline" size="icon" asChild>
+            <Link to="/admin">
+              <Shield className="h-4 w-4" />
+            </Link>
           </Button>
           <ModeToggle />
         </div>
