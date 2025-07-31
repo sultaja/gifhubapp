@@ -1,12 +1,12 @@
 import { supabase } from "@/integrations/supabase/client";
-import { Gif, Category, Tag } from "@/types";
+import { Gif, Category, Tag, SiteSettings } from "@/types";
 
 // The base query for fetching GIFs with their related category and tags
-const BASE_GIF_QUERY = "id, title, url, slug, category:categories(id, name, slug), tags(id, name, slug)";
+const BASE_GIF_QUERY = "id, title, url, slug, category:categories(id, name, slug, icon), tags(id, name, slug)";
 
 // --- CATEGORY API ---
 export const getCategories = async (): Promise<Category[]> => {
-  const { data, error } = await supabase.from("categories").select("*").order("name", { ascending: true });
+  const { data, error } = await supabase.from("categories").select("*, icon").order("name", { ascending: true });
   if (error) throw new Error(error.message);
   return data || [];
 };
@@ -160,7 +160,7 @@ export const getGifBySlug = async (slug: string): Promise<Gif | null> => {
 };
 
 export const getGifsByCategorySlug = async (slug: string): Promise<{ category: Category | null, gifs: Gif[] }> => {
-    const { data: category, error: categoryError } = await supabase.from('categories').select('*').eq('slug', slug).single();
+    const { data: category, error: categoryError } = await supabase.from('categories').select('*, icon').eq('slug', slug).single();
     if (categoryError || !category) {
         throw new Error(categoryError?.message || "Category not found");
     }
@@ -198,15 +198,31 @@ export const getGifsByTagSlug = async (slug: string): Promise<{ tag: Tag | null,
 };
 
 export const searchGifs = async (query: string): Promise<Gif[]> => {
+    if (!query) return [];
+    
+    const { data: rpcData, error: rpcError } = await supabase.rpc('search_gifs_advanced', { search_term: query });
+
+    if (rpcError) {
+        console.error("Error searching gifs via RPC:", rpcError);
+        throw new Error(rpcError.message);
+    }
+
+    const gifIds = rpcData.map((item: { id: string }) => item.id);
+
+    if (gifIds.length === 0) {
+        return [];
+    }
+
     const { data, error } = await supabase
         .from('gifs')
         .select(BASE_GIF_QUERY)
-        .textSearch('title', `'${query}'`, { type: 'websearch' });
+        .in('id', gifIds);
 
     if (error) {
-        console.error("Error searching gifs:", error);
+        console.error("Error fetching searched gifs:", error);
         throw new Error(error.message);
     }
+    
     return (data as any) || [];
 };
 
@@ -223,3 +239,33 @@ export const getStats = async () => {
 
     return { gifsCount, categoriesCount, tagsCount };
 }
+
+// --- SITE SETTINGS API ---
+export const getSiteSettings = async (): Promise<SiteSettings | null> => {
+    const { data, error } = await supabase
+        .from('site_settings')
+        .select('*')
+        .eq('id', 1)
+        .single();
+
+    if (error) {
+        console.error("Error fetching site settings:", error);
+        return null;
+    }
+    return data;
+};
+
+export const updateSiteSettings = async (settings: Partial<SiteSettings>): Promise<SiteSettings> => {
+    const { data, error } = await supabase
+        .from('site_settings')
+        .update(settings)
+        .eq('id', 1)
+        .select()
+        .single();
+
+    if (error) {
+        console.error("Error updating site settings:", error);
+        throw new Error(error.message);
+    }
+    return data;
+};

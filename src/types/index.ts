@@ -8,6 +8,7 @@ export interface Category {
   id: string;
   name: string;
   slug: string;
+  icon?: string;
 }
 
 export interface Gif {
@@ -18,4 +19,12 @@ export interface Gif {
   tags: Tag[];
   category: Category | null;
   submittedBy?: string;
+}
+
+export interface SiteSettings {
+    id: number;
+    logo_url?: string | null;
+    header_scripts?: string | null;
+    footer_scripts?: string | null;
+    page_titles?: Record<string, string> | null;
 }

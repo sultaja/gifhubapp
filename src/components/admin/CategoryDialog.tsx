@@ -16,6 +16,7 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
+  FormDescription,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { useForm } from "react-hook-form";
@@ -31,6 +32,7 @@ const formSchema = z.object({
   slug: z.string().min(2, {
     message: "Slug must be at least 2 characters.",
   }),
+  icon: z.string().optional(),
 });
 
 export type CategoryFormValues = z.infer<typeof formSchema>;
@@ -57,14 +59,15 @@ export function CategoryDialog({ children, category, onSave, isSaving }: Categor
     defaultValues: {
       name: "",
       slug: "",
+      icon: "",
     },
   });
 
   useEffect(() => {
     if (category) {
-      form.reset({ name: category.name, slug: category.slug });
+      form.reset({ name: category.name, slug: category.slug, icon: category.icon || "" });
     } else {
-      form.reset({ name: "", slug: "" });
+      form.reset({ name: "", slug: "", icon: "" });
     }
   }, [category, form]);
 
@@ -116,6 +119,22 @@ export function CategoryDialog({ children, category, onSave, isSaving }: Categor
                   <FormControl>
                     <Input placeholder="e.g., team-meetings" {...field} />
                   </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="icon"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Icon Name</FormLabel>
+                  <FormControl>
+                    <Input placeholder="e.g., Rocket" {...field} />
+                  </FormControl>
+                  <FormDescription>
+                    Enter a valid icon name from Lucide React.
+                  </FormDescription>
                   <FormMessage />
                 </FormItem>
               )}

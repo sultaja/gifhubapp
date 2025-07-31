@@ -2,11 +2,12 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import GifCard from "@/components/GifCard";
 import { useQuery } from "@tanstack/react-query";
 import { getCategories, getFeaturedGifs } from "@/services/api";
 import { Skeleton } from "@/components/ui/skeleton";
+import CategoryCard from "@/components/CategoryCard";
 
 const Index = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -58,14 +59,12 @@ const Index = () => {
       {/* Trending Categories */}
       <section className="py-12">
         <h2 className="text-2xl font-bold mb-6 text-center">Trending Categories</h2>
-        <div className="flex flex-wrap justify-center gap-2">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
           {isLoadingCategories ? (
-            Array.from({ length: 8 }).map((_, i) => <Skeleton key={i} className="h-10 w-28 rounded-md" />)
+            Array.from({ length: 6 }).map((_, i) => <Skeleton key={i} className="h-28 w-full rounded-lg" />)
           ) : (
             categories?.map((category) => (
-              <Button key={category.id} variant="outline" asChild>
-                <Link to={`/category/${category.slug}`}>{category.name}</Link>
-              </Button>
+              <CategoryCard key={category.id} category={category} />
             ))
           )}
         </div>
