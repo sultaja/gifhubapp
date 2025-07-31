@@ -92,9 +92,10 @@ const AdminTagsPage = () => {
     if (tagId) {
       updateMutation.mutate({ id: tagId, values });
     } else {
+      const uniqueSlug = `${values.slug}-${Math.random().toString(36).substring(2, 7)}`;
       createMutation.mutate({
         name: values.name,
-        slug: values.slug,
+        slug: uniqueSlug,
         tag_translations: [],
       });
     }
