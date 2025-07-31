@@ -16,6 +16,7 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
+  FormDescription,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import {
@@ -29,12 +30,11 @@ import { Switch } from "@/components/ui/switch";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { Gif, Category, Tag } from "@/types";
-import { useEffect, useState, useMemo } from "react";
+import { Gif, Category } from "@/types";
+import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { getCategories, getTags } from "@/services/api";
+import { getCategories } from "@/services/api";
 import { useTranslation } from "react-i18next";
-import { MultiSelectCombobox } from "@/components/ui/MultiSelectCombobox";
 import { createSlug } from "@/utils/slug";
 
 const formSchema = z.object({
@@ -42,7 +42,7 @@ const formSchema = z.object({
   url: z.string().url("Please enter a valid GIF URL."),
   slug: z.string().min(3, "Slug must be at least 3 characters long."),
   category_id: z.string().uuid("Please select a category."),
-  tags: z.array(z.string().uuid()).min(1, "Please select at least one tag."),
+  tags: z.string().optional(),
   is_featured: z.boolean().default(false),
 });
 
@@ -64,15 +64,6 @@ export function GifDialog({ children, gif, onSave, isSaving }: GifDialogProps) {
     queryFn: getCategories,
   });
 
-  const { data: tags, isLoading: isLoadingTags } = useQuery<Tag[]>({
-    queryKey: ["tags"],
-    queryFn: getTags,
-  });
-
-  const tagOptions = useMemo(() => {
-    return tags?.map(tag => ({ value: tag.id, label: tag.name })) || [];
-  }, [tags]);
-
   const form = useForm<GifFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -80,32 +71,32 @@ export function GifDialog({ children, gif, onSave, isSaving }: GifDialogProps) {
       url: "",
       slug: "",
       category_id: undefined,
-      tags: [],
+      tags: "",
       is_featured: false,
     },
   });
 
   useEffect(() => {
-    if (gif) {
+    if (open && gif) {
       form.reset({
         title: gif.title,
         url: gif.url,
         slug: gif.slug,
         category_id: gif.category?.id,
-        tags: gif.tags.map(t => t.id),
+        tags: gif.tags.map(t => t.name).join(', '),
         is_featured: gif.is_featured || false,
       });
-    } else {
+    } else if (open) {
       form.reset({
         title: "",
         url: "",
         slug: "",
         category_id: undefined,
-        tags: [],
+        tags: "",
         is_featured: false,
       });
     }
-  }, [gif, form]);
+  }, [gif, form, open]);
 
   const titleValue = form.watch("title");
   useEffect(() => {
@@ -207,13 +198,11 @@ export function GifDialog({ children, gif, onSave, isSaving }: GifDialogProps) {
                 <FormItem>
                   <FormLabel>{t('admin.gif_dialog.tags')}</FormLabel>
                   <FormControl>
-                    <MultiSelectCombobox
-                      options={tagOptions}
-                      selected={field.value}
-                      onChange={field.onChange}
-                      placeholder={isLoadingTags ? t('submit_page.form.loading') : "Select tags..."}
-                    />
+                    <Input placeholder={t('submit_page.form.tags_placeholder')} {...field} />
                   </FormControl>
+                  <FormDescription>
+                    {t('submit_page.form.tags_desc')}
+                  </FormDescription>
                   <FormMessage />
                 </FormItem>
               )}

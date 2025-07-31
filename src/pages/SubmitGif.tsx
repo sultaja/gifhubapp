@@ -1,9 +1,8 @@
-import { useState, useMemo } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -12,6 +11,7 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
+  FormDescription,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import {
@@ -22,17 +22,16 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useQuery } from "@tanstack/react-query";
-import { getCategories, getTags } from "@/services/api";
+import { getCategories, submitNewGif } from "@/services/api";
 import { showSuccess, showError, showLoading, dismissToast } from "@/utils/toast";
-import { Category, Tag } from "@/types";
+import { Category } from "@/types";
 import { useTranslation } from "react-i18next";
-import { MultiSelectCombobox } from "@/components/ui/MultiSelectCombobox";
 
 const formSchema = z.object({
   title: z.string().min(3, "Title must be at least 3 characters long."),
   url: z.string().url("Please enter a valid GIF URL."),
   category_id: z.string().uuid("Please select a category."),
-  tags: z.array(z.string().uuid()).min(1, "Please select at least one tag."),
+  tags: z.string().min(1, "Please enter at least one tag."),
 });
 
 const SubmitGifPage = () => {
@@ -45,21 +44,12 @@ const SubmitGifPage = () => {
     queryFn: getCategories,
   });
 
-  const { data: tags, isLoading: isLoadingTags } = useQuery<Tag[]>({
-    queryKey: ["tags"],
-    queryFn: getTags,
-  });
-
-  const tagOptions = useMemo(() => {
-    return tags?.map(tag => ({ value: tag.id, label: tag.name })) || [];
-  }, [tags]);
-
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       title: "",
       url: "",
-      tags: [],
+      tags: "",
     },
   });
 
@@ -67,46 +57,16 @@ const SubmitGifPage = () => {
     setIsSubmitting(true);
     const toastId = showLoading(t('submit_page.toast.submitting'));
 
-    const slug = values.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
-
-    const { data: gifData, error: gifError } = await supabase
-      .from("gifs")
-      .insert({
-        title: values.title,
-        url: values.url,
-        slug: `${slug}-${Date.now()}`, // Ensure unique slug
-        category_id: values.category_id,
-        is_approved: false,
-      })
-      .select()
-      .single();
-
-    if (gifError || !gifData) {
+    try {
+      await submitNewGif(values);
       dismissToast(toastId);
-      showError(gifError?.message || t('submit_page.toast.submit_error'));
+      showSuccess(t('submit_page.toast.pending_success'));
+      navigate(`/`);
+    } catch (error: any) {
+      dismissToast(toastId);
+      showError(error?.message || t('submit_page.toast.submit_error'));
       setIsSubmitting(false);
-      return;
     }
-
-    const gifTags = values.tags.map(tagId => ({
-        gif_id: gifData.id,
-        tag_id: tagId
-    }));
-
-    const { error: tagsError } = await supabase.from("gif_tags").insert(gifTags);
-
-    if (tagsError) {
-        // Attempt to clean up the created GIF if tag association fails
-        await supabase.from("gifs").delete().eq("id", gifData.id);
-        dismissToast(toastId);
-        showError(tagsError.message || t('submit_page.toast.tags_error'));
-        setIsSubmitting(false);
-        return;
-    }
-
-    dismissToast(toastId);
-    showSuccess(t('submit_page.toast.pending_success'));
-    navigate(`/`);
   };
 
   return (
@@ -178,13 +138,11 @@ const SubmitGifPage = () => {
               <FormItem>
                 <FormLabel>{t('submit_page.form.tags')}</FormLabel>
                 <FormControl>
-                  <MultiSelectCombobox
-                    options={tagOptions}
-                    selected={field.value}
-                    onChange={field.onChange}
-                    placeholder={isLoadingTags ? t('submit_page.form.loading') : "Select tags..."}
-                  />
+                  <Input placeholder={t('submit_page.form.tags_placeholder')} {...field} />
                 </FormControl>
+                <FormDescription>
+                  {t('submit_page.form.tags_desc')}
+                </FormDescription>
                 <FormMessage />
               </FormItem>
             )}

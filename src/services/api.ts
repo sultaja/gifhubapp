@@ -7,15 +7,17 @@ import {
   ContentSection, 
   UiTranslation, 
   ContactSubmission, 
-  HierarchicalCategory 
+  HierarchicalCategory,
+  TagTranslation
 } from "@/types";
+import { createSlug } from "@/utils/slug";
 
 const mapGifData = (gif: any): Gif => {
   if (!gif) return gif;
   const mapped = {
     ...gif,
     category: gif.categories || null,
-    tags: gif.gif_tags?.map((gt: any) => gt.tags).filter(Boolean) || [],
+    tags: gif.gif_tags?.map((gt: any) => gt.tags).filter(Boolean).map((t: any) => ({ ...t, tag_translations: [] })) || [],
     gif_translations: gif.gif_translations || [],
   };
   delete mapped.categories;
@@ -26,7 +28,7 @@ const mapGifData = (gif: any): Gif => {
 export const getGifs = async (): Promise<Gif[]> => {
   const { data, error } = await supabase
     .from("gifs")
-    .select('*, categories(*, category_translations(*)), gif_tags(tags(*, tag_translations(*))), gif_translations(*)')
+    .select('*, categories(*, category_translations(*)), gif_tags(tags(*)), gif_translations(*)')
     .order("created_at", { ascending: false });
 
   if (error) throw new Error(error.message);
@@ -36,7 +38,7 @@ export const getGifs = async (): Promise<Gif[]> => {
 export const getPendingGifs = async (): Promise<Gif[]> => {
   const { data, error } = await supabase
     .from("gifs")
-    .select('*, categories(*, category_translations(*)), gif_tags(tags(*, tag_translations(*))), gif_translations(*)')
+    .select('*, categories(*, category_translations(*)), gif_tags(tags(*)), gif_translations(*)')
     .eq('is_approved', false)
     .order("created_at", { ascending: true });
 
@@ -47,7 +49,7 @@ export const getPendingGifs = async (): Promise<Gif[]> => {
 export const getLatestGifs = async (limit: number = 12): Promise<Gif[]> => {
   const { data, error } = await supabase
     .from("gifs")
-    .select('*, categories(*, category_translations(*)), gif_tags(tags(*, tag_translations(*))), gif_translations(*)')
+    .select('*, categories(*, category_translations(*)), gif_tags(tags(*)), gif_translations(*)')
     .eq('is_approved', true)
     .order("created_at", { ascending: false })
     .limit(limit);
@@ -59,7 +61,7 @@ export const getLatestGifs = async (limit: number = 12): Promise<Gif[]> => {
 export const getFeaturedGifs = async (limit: number = 8): Promise<Gif[]> => {
   const { data, error } = await supabase
     .from("gifs")
-    .select('*, categories(*, category_translations(*)), gif_tags(tags(*, tag_translations(*))), gif_translations(*)')
+    .select('*, categories(*, category_translations(*)), gif_tags(tags(*)), gif_translations(*)')
     .eq("is_featured", true)
     .eq('is_approved', true)
     .order("created_at", { ascending: false })
@@ -72,7 +74,7 @@ export const getFeaturedGifs = async (limit: number = 8): Promise<Gif[]> => {
 export const getGifBySlug = async (slug: string): Promise<Gif> => {
   const { data, error } = await supabase
     .from("gifs")
-    .select('*, categories(*, category_translations(*)), gif_tags(tags(*, tag_translations(*))), gif_translations(*)')
+    .select('*, categories(*, category_translations(*)), gif_tags(tags(*)), gif_translations(*)')
     .eq("slug", slug)
     .eq('is_approved', true)
     .single();
@@ -102,7 +104,7 @@ export const getGifsByCategorySlug = async (slug: string) => {
 
   const { data: gifs, error: gifsError } = await supabase
     .from('gifs')
-    .select('*, categories!inner(*, category_translations(*)), gif_tags(tags(*, tag_translations(*))), gif_translations(*)')
+    .select('*, categories!inner(*, category_translations(*)), gif_tags(tags(*)), gif_translations(*)')
     .in('category_id', categoryIds)
     .eq('is_approved', true)
     .order('created_at', { ascending: false });
@@ -124,7 +126,7 @@ export const getGifsByTagSlug = async (slug: string) => {
 
   const { data, error: gifsError } = await supabase
     .from('gif_tags')
-    .select('gifs!inner(*, categories(*, category_translations(*)), gif_tags(tags(*, tag_translations(*))), gif_translations(*))')
+    .select('gifs!inner(*, categories(*, category_translations(*)), gif_tags(tags(*)), gif_translations(*))')
     .eq('tag_id', tag.id)
     .eq('gifs.is_approved', true);
 
@@ -145,7 +147,7 @@ export const searchGifs = async (searchTerm: string): Promise<Gif[]> => {
 
   const { data: gifs, error: gifsError } = await supabase
     .from('gifs')
-    .select('*, categories(*, category_translations(*)), gif_tags(tags(*, tag_translations(*))), gif_translations(*)')
+    .select('*, categories(*, category_translations(*)), gif_tags(tags(*)), gif_translations(*)')
     .in('id', gifIds)
     .eq('is_approved', true);
 
@@ -188,9 +190,27 @@ export const getHierarchicalCategories = async (): Promise<HierarchicalCategory[
 };
 
 export const getTags = async (): Promise<Tag[]> => {
-  const { data, error } = await supabase.from("tags").select("*, tag_translations(*)").order("name");
-  if (error) throw new Error(error.message);
-  return data;
+  const { data: tags, error: tagsError } = await supabase.from("tags").select("*").order("name");
+  if (tagsError) throw new Error(tagsError.message);
+
+  const tagIds = tags.map(t => t.id);
+  if (tagIds.length === 0) return tags.map(t => ({ ...t, tag_translations: [] }));
+
+  const { data: translations, error: transError } = await supabase.from('tag_translations').select('*').in('tag_id', tagIds);
+  if (transError) throw new Error(transError.message);
+
+  const translationsMap = new Map<string, TagTranslation[]>();
+  for (const t of translations) {
+      if (!translationsMap.has(t.tag_id)) {
+          translationsMap.set(t.tag_id, []);
+      }
+      translationsMap.get(t.tag_id)!.push(t);
+  }
+
+  return tags.map(tag => ({
+      ...tag,
+      tag_translations: translationsMap.get(tag.id) || []
+  }));
 };
 
 export const getStats = async () => {
@@ -205,16 +225,35 @@ export const getStats = async () => {
   return { gifsCount, categoriesCount, tagsCount };
 };
 
+const processAndLinkTags = async (gifId: string, tagsString: string | undefined) => {
+  const { error: deleteError } = await supabase.from('gif_tags').delete().eq('gif_id', gifId);
+  if (deleteError) throw deleteError;
+
+  if (tagsString && tagsString.trim() !== '') {
+      const tagNames = tagsString.split(',').map(t => t.trim()).filter(Boolean);
+      if (tagNames.length === 0) return;
+
+      const tagUpserts = tagNames.map(name => ({ name, slug: createSlug(name) }));
+      
+      const { data: upsertedTags, error: upsertError } = await supabase
+          .from('tags')
+          .upsert(tagUpserts, { onConflict: 'name' })
+          .select('id');
+      
+      if (upsertError) throw upsertError;
+
+      const gifTags = upsertedTags.map((tag: {id: string}) => ({ gif_id: gifId, tag_id: tag.id }));
+      const { error: tagsError } = await supabase.from("gif_tags").insert(gifTags);
+      if (tagsError) throw tagsError;
+  }
+}
+
 export const createGif = async (values: any) => {
   const { tags, ...gifData } = values;
   const { data, error } = await supabase.from('gifs').insert(gifData).select().single();
   if (error) throw new Error(error.message);
 
-  if (tags && tags.length > 0) {
-    const gifTags = tags.map((tagId: string) => ({ gif_id: data.id, tag_id: tagId }));
-    const { error: tagsError } = await supabase.from('gif_tags').insert(gifTags);
-    if (tagsError) throw new Error(tagsError.message);
-  }
+  await processAndLinkTags(data.id, tags);
   return data;
 };
 
@@ -223,14 +262,7 @@ export const updateGif = async (id: string, values: any) => {
   const { data, error } = await supabase.from('gifs').update(gifData).eq('id', id).select().single();
   if (error) throw new Error(error.message);
 
-  const { error: deleteError } = await supabase.from('gif_tags').delete().eq('gif_id', id);
-  if (deleteError) throw new Error(deleteError.message);
-
-  if (tags && tags.length > 0) {
-    const gifTags = tags.map((tagId: string) => ({ gif_id: data.id, tag_id: tagId }));
-    const { error: tagsError } = await supabase.from('gif_tags').insert(gifTags);
-    if (tagsError) throw new Error(tagsError.message);
-  }
+  await processAndLinkTags(id, tags);
   return data;
 };
 
@@ -385,4 +417,31 @@ export const deleteContactSubmission = async (id: number) => {
 export const deleteContactSubmissions = async (ids: number[]) => {
   const { error } = await supabase.from('contact_submissions').delete().in('id', ids);
   if (error) throw new Error(error.message);
+};
+
+export const submitNewGif = async (values: { title: string; url: string; category_id: string; tags: string; }) => {
+  const slug = `${createSlug(values.title)}-${Date.now()}`;
+
+  const { data: gifData, error: gifError } = await supabase
+    .from("gifs")
+    .insert({
+      title: values.title,
+      url: values.url,
+      slug: slug,
+      category_id: values.category_id,
+      is_approved: false,
+    })
+    .select()
+    .single();
+
+  if (gifError) throw gifError;
+
+  try {
+    await processAndLinkTags(gifData.id, values.tags);
+  } catch (tagError) {
+    await supabase.from("gifs").delete().eq("id", gifData.id);
+    throw tagError;
+  }
+
+  return gifData;
 };
