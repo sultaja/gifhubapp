@@ -4,6 +4,7 @@ import { DataTable } from "@/components/admin/DataTable";
 import { columns } from "./GifSubmissionsColumns";
 import { useTranslation } from "react-i18next";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useReactTable, getCoreRowModel, getPaginationRowModel } from "@tanstack/react-table";
 
 const AdminGifSubmissionsPage = () => {
   const { t } = useTranslation();
@@ -12,11 +13,20 @@ const AdminGifSubmissionsPage = () => {
     queryFn: getPendingGifs,
   });
 
+  const table = useReactTable({
+    data: gifs || [],
+    columns,
+    getCoreRowModel: getCoreRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
+  });
+
   if (isLoading) {
     return (
       <div>
-        <Skeleton className="h-8 w-48 mb-4" />
-        <Skeleton className="h-4 w-72 mb-8" />
+        <h2 className="text-2xl font-bold tracking-tight">{t("admin.gif_submissions.title")}</h2>
+        <p className="text-muted-foreground mb-6">
+          {t("admin.gif_submissions.description")}
+        </p>
         <div className="space-y-2">
           <Skeleton className="h-20 w-full" />
           <Skeleton className="h-20 w-full" />
@@ -37,10 +47,8 @@ const AdminGifSubmissionsPage = () => {
         {t("admin.gif_submissions.description")}
       </p>
       <DataTable
+        table={table}
         columns={columns}
-        data={gifs || []}
-        // filterColumn="title"
-        // emptyStateMessage={t("admin.gif_submissions.empty_state")}
       />
     </div>
   );
