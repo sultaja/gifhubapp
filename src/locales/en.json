@@ -1,0 +1,196 @@
+{
+  "nav": {
+    "submit": "Submit a GIF"
+  },
+  "homepage": {
+    "hero_title": "The perfect GIF for your next big move.",
+    "hero_subtitle": "A sleek, ultra-fast, and highly-curated platform for discovering and sharing GIFs for the professional world.",
+    "search_placeholder": "Search by title, tag, or category...",
+    "trending_categories": "Trending Categories",
+    "featured_gifs": "Featured GIFs"
+  },
+  "footer": {
+    "built_by": "Built by",
+    "source_code": "The source code is available on",
+    "about": "About",
+    "contact": "Contact",
+    "privacy": "Privacy",
+    "terms": "Terms",
+    "advertise": "Advertise"
+  },
+  "gif_detail": {
+    "by_category": "In category",
+    "tags": "Tags",
+    "copy_gif_link": "Copy GIF Link",
+    "copy_markdown_link": "Copy Markdown",
+    "download_gif": "Download GIF",
+    "copied": "Copied to clipboard!",
+    "related_gifs": "Related GIFs"
+  },
+  "category_page": {
+    "title": "GIFs in Category: {{categoryName}}"
+  },
+  "tag_page": {
+    "title": "GIFs tagged with: {{tagName}}"
+  },
+  "submit_page": {
+    "title": "Submit a GIF",
+    "subtitle": "Share your favorite professional GIF with the community. Submissions will be reviewed before publishing.",
+    "form": {
+      "title": "Title",
+      "title_placeholder": "e.g., 'Success Kid'",
+      "url": "GIF URL",
+      "category": "Category",
+      "category_placeholder": "Select a category",
+      "tags": "Tags",
+      "tags_placeholder": "Select tags...",
+      "loading": "Loading..."
+    },
+    "submitting": "Submitting...",
+    "submit_button": "Submit GIF",
+    "toast": {
+      "submitting": "Submitting your GIF for review...",
+      "success": "GIF submitted successfully! It will be reviewed shortly.",
+      "submit_error": "Failed to submit GIF. Please try again.",
+      "tags_error": "Failed to add tags. Please try again."
+    }
+  },
+  "admin_layout": {
+    "dashboard": "Dashboard",
+    "gifs": "GIFs",
+    "categories": "Categories",
+    "tags": "Tags",
+    "submissions": "Submissions",
+    "back_to_site": "Back to Site"
+  },
+  "admin_dashboard": {
+    "title": "Dashboard",
+    "description": "Overview of your GifHub.",
+    "total_gifs": "Total GIFs",
+    "pending_submissions": "Pending Submissions",
+    "total_categories": "Total Categories",
+    "total_tags": "Total Tags"
+  },
+  "admin_gifs": {
+    "title": "Manage GIFs",
+    "description": "Add, edit, or delete GIFs.",
+    "add_button": "Add GIF",
+    "empty_state": "No GIFs found.",
+    "columns": {
+      "gif": "GIF",
+      "title": "Title",
+      "category": "Category",
+      "tags": "Tags",
+      "featured": "Featured",
+      "created_at": "Created At"
+    },
+    "confirm_delete": "Are you sure you want to delete this GIF? This action cannot be undone.",
+    "toast": {
+      "saved": "GIF saved successfully.",
+      "deleted": "GIF deleted successfully.",
+      "error_save": "Failed to save GIF.",
+      "error_delete": "Failed to delete GIF."
+    }
+  },
+  "admin_categories": {
+    "title": "Manage Categories",
+    "description": "Add, edit, or delete categories.",
+    "add_button": "Add Category",
+    "empty_state": "No categories found.",
+    "columns": {
+      "name": "Name",
+      "slug": "Slug",
+      "created_at": "Created At"
+    },
+    "confirm_delete": "Are you sure you want to delete this category?",
+    "toast": {
+      "saved": "Category saved successfully.",
+      "deleted": "Category deleted successfully.",
+      "error_save": "Failed to save category.",
+      "error_delete": "Failed to delete category."
+    }
+  },
+  "admin_tags": {
+    "title": "Manage Tags",
+    "description": "Add, edit, or delete tags.",
+    "add_button": "Add Tag",
+    "empty_state": "No tags found.",
+    "columns": {
+      "name": "Name",
+      "slug": "Slug",
+      "created_at": "Created At"
+    },
+    "confirm_delete": "Are you sure you want to delete this tag?",
+    "toast": {
+      "saved": "Tag saved successfully.",
+      "deleted": "Tag deleted successfully.",
+      "error_save": "Failed to save tag.",
+      "error_delete": "Failed to delete tag."
+    }
+  },
+  "admin_submissions": {
+    "title": "Pending Submissions",
+    "description": "Review and approve or reject user-submitted GIFs.",
+    "approve_button": "Review & Approve",
+    "reject_button": "Reject",
+    "confirm_reject": "Are you sure you want to reject this GIF? This action cannot be undone.",
+    "toast": {
+      "approved": "GIF approved and published.",
+      "rejected": "GIF rejected and deleted.",
+      "error_approve": "Failed to approve GIF.",
+      "error_reject": "Failed to reject GIF."
+    },
+    "empty_state": "No pending submissions.",
+    "columns": {
+      "gif": "GIF",
+      "title": "Title",
+      "category": "Category",
+      "tags": "Tags",
+      "submitted_at": "Submitted At"
+    }
+  },
+  "dialog": {
+    "gif": {
+      "add_title": "Add New GIF",
+      "edit_title": "Edit GIF",
+      "description": "Fill in the details for the GIF. Click save when you're done.",
+      "form": {
+        "title": "Title",
+        "url": "URL",
+        "slug": "Slug",
+        "category": "Category",
+        "category_placeholder": "Select a category",
+        "tags": "Tags",
+        "tags_placeholder": "Select tags...",
+        "featured": "Featured",
+        "featured_desc": "Featured GIFs appear on the homepage."
+      }
+    },
+    "category": {
+      "add_title": "Add New Category",
+      "edit_title": "Edit Category",
+      "description": "Fill in the details for the category.",
+      "form": {
+        "name": "Name",
+        "slug": "Slug"
+      }
+    },
+    "tag": {
+      "add_title": "Add New Tag",
+      "edit_title": "Edit Tag",
+      "description": "Fill in the details for the tag.",
+      "form": {
+        "name": "Name",
+        "slug": "Slug"
+      }
+    },
+    "cancel": "Cancel",
+    "save": "Save changes",
+    "saving": "Saving..."
+  },
+  "errors": {
+    "fetch_error": "Could not fetch {{resource}}",
+    "not_found": "404 - Page Not Found",
+    "not_found_message": "Sorry, the page you are looking for does not exist."
+  }
+}
