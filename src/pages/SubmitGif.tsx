@@ -50,6 +50,7 @@ const SubmitGifPage = () => {
       title: "",
       url: "",
       tags: "",
+      category_id: undefined,
     },
   });
 

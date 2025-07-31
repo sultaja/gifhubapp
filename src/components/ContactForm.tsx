@@ -5,7 +5,6 @@ import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useMutation } from "@tanstack/react-query";
 import { createContactSubmission } from "@/services/api";
 import { showSuccess, showError, showLoading, dismissToast } from "@/utils/toast";
@@ -14,21 +13,19 @@ import { useTranslation } from "react-i18next";
 const formSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters."),
   email: z.string().email("Please enter a valid email address."),
-  company: z.string().optional(),
-  project_details: z.string().min(10, "Please provide some details about your project.").optional(),
-  budget_range: z.string().optional(),
+  message: z.string().min(10, "Message must be at least 10 characters."),
 });
+
+type FormValues = z.infer<typeof formSchema>;
 
 const ContactForm = () => {
   const { t } = useTranslation();
-  const form = useForm<z.infer<typeof formSchema>>({
+  const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: "",
       email: "",
-      company: "",
-      project_details: "",
-      budget_range: "",
+      message: "",
     },
   });
 
@@ -47,17 +44,15 @@ const ContactForm = () => {
     },
   });
 
-  const onSubmit = (values: z.infer<typeof formSchema>) => {
+  const onSubmit = (values: FormValues) => {
     loadingToastId = showLoading(t('contact_page.form.toast_sending'));
-    mutation.mutate(values);
+    const submissionData = {
+      name: values.name,
+      email: values.email,
+      project_details: values.message, // Map message to project_details
+    };
+    mutation.mutate(submissionData);
   };
-
-  const budgetRanges = [
-    "$5,000 - $10,000",
-    "$10,000 - $20,000",
-    "$20,000 - $50,000",
-    "$50,000+",
-  ];
 
   return (
     <Form {...form}>
@@ -78,35 +73,10 @@ const ContactForm = () => {
             </FormItem>
           )} />
         </div>
-        <FormField control={form.control} name="company" render={({ field }) => (
+        <FormField control={form.control} name="message" render={({ field }) => (
           <FormItem>
-            <FormLabel>{t('contact_page.form.company')}</FormLabel>
-            <FormControl><Input placeholder={t('contact_page.form.company_placeholder')} {...field} /></FormControl>
-            <FormMessage />
-          </FormItem>
-        )} />
-        <FormField control={form.control} name="project_details" render={({ field }) => (
-          <FormItem>
-            <FormLabel>{t('contact_page.form.details')}</FormLabel>
-            <FormControl><Textarea placeholder={t('contact_page.form.details_placeholder')} {...field} rows={5} /></FormControl>
-            <FormMessage />
-          </FormItem>
-        )} />
-        <FormField control={form.control} name="budget_range" render={({ field }) => (
-          <FormItem>
-            <FormLabel>{t('contact_page.form.budget')}</FormLabel>
-            <Select onValueChange={field.onChange} defaultValue={field.value}>
-              <FormControl>
-                <SelectTrigger>
-                  <SelectValue placeholder={t('contact_page.form.budget_placeholder')} />
-                </SelectTrigger>
-              </FormControl>
-              <SelectContent>
-                {budgetRanges.map(range => (
-                  <SelectItem key={range} value={range}>{range}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <FormLabel>{t('contact_page.form.message')}</FormLabel>
+            <FormControl><Textarea placeholder={t('contact_page.form.message_placeholder')} {...field} rows={5} /></FormControl>
             <FormMessage />
           </FormItem>
         )} />
