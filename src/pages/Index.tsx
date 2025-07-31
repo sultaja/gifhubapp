@@ -5,7 +5,7 @@ import { Search } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import GifCard from "@/components/GifCard";
 import { useQuery } from "@tanstack/react-query";
-import { getCategories, getFeaturedGifs } from "@/services/api";
+import { getCategories, getLatestGifs, getFeaturedGifs } from "@/services/api";
 import { Skeleton } from "@/components/ui/skeleton";
 import CategoryCard from "@/components/CategoryCard";
 
@@ -18,9 +18,14 @@ const Index = () => {
     queryFn: getCategories,
   });
 
-  const { data: gifs, isLoading: isLoadingGifs } = useQuery({
+  const { data: latestGifs, isLoading: isLoadingLatestGifs } = useQuery({
+    queryKey: ["latestGifs"],
+    queryFn: () => getLatestGifs(12),
+  });
+
+  const { data: featuredGifs, isLoading: isLoadingFeaturedGifs } = useQuery({
     queryKey: ["featuredGifs"],
-    queryFn: () => getFeaturedGifs(12),
+    queryFn: () => getFeaturedGifs(8),
   });
 
   const handleSearchSubmit = (e: React.FormEvent<HTMLFormElement>) => {
@@ -56,6 +61,22 @@ const Index = () => {
         </div>
       </section>
 
+      {/* Featured GIFs */}
+      {featuredGifs && featuredGifs.length > 0 && (
+        <section className="py-12">
+          <h2 className="text-2xl font-bold mb-6 text-center">Featured GIFs</h2>
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            {isLoadingFeaturedGifs ? (
+              Array.from({ length: 8 }).map((_, i) => <Skeleton key={i} className="w-full h-auto aspect-square rounded-lg" />)
+            ) : (
+              featuredGifs?.map((gif) => (
+                <GifCard key={gif.id} gif={gif} />
+              ))
+            )}
+          </div>
+        </section>
+      )}
+
       {/* Trending Categories */}
       <section className="py-12">
         <h2 className="text-2xl font-bold mb-6 text-center">Trending Categories</h2>
@@ -70,14 +91,14 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Featured GIFs */}
+      {/* Latest GIFs */}
       <section className="py-12">
-        <h2 className="text-2xl font-bold mb-6 text-center">Featured GIFs</h2>
+        <h2 className="text-2xl font-bold mb-6 text-center">Latest GIFs</h2>
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-          {isLoadingGifs ? (
+          {isLoadingLatestGifs ? (
             Array.from({ length: 12 }).map((_, i) => <Skeleton key={i} className="w-full h-auto aspect-square rounded-lg" />)
           ) : (
-            gifs?.map((gif) => (
+            latestGifs?.map((gif) => (
               <GifCard key={gif.id} gif={gif} />
             ))
           )}

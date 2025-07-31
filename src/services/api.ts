@@ -1,8 +1,9 @@
 import { supabase } from "@/integrations/supabase/client";
 import { Gif, Category, Tag, SiteSettings } from "@/types";
+import { GifFormValues } from "@/components/admin/GifDialog";
 
 // The base query for fetching GIFs with their related category and tags
-const BASE_GIF_QUERY = "id, title, url, slug, category:categories(id, name, slug, icon), tags(id, name, slug)";
+const BASE_GIF_QUERY = "id, title, url, slug, is_featured, category:categories(id, name, slug, icon), tags(id, name, slug)";
 
 // --- CATEGORY API ---
 export const getCategories = async (): Promise<Category[]> => {
@@ -64,7 +65,7 @@ export const getGifs = async (): Promise<Gif[]> => {
   return (data as any) || [];
 };
 
-export const createGif = async (values: { title: string; url: string; slug: string; category_id: string; tags: string[] }) => {
+export const createGif = async (values: GifFormValues) => {
   const { data: gifData, error: gifError } = await supabase
     .from("gifs")
     .insert({
@@ -72,6 +73,7 @@ export const createGif = async (values: { title: string; url: string; slug: stri
       url: values.url,
       slug: values.slug,
       category_id: values.category_id,
+      is_featured: values.is_featured,
     })
     .select()
     .single();
@@ -94,7 +96,7 @@ export const createGif = async (values: { title: string; url: string; slug: stri
   return gifData;
 };
 
-export const updateGif = async (id: string, values: { title: string; url: string; slug: string; category_id: string; tags: string[] }) => {
+export const updateGif = async (id: string, values: GifFormValues) => {
   const { data: gifData, error: gifError } = await supabase
     .from("gifs")
     .update({
@@ -102,6 +104,7 @@ export const updateGif = async (id: string, values: { title: string; url: string
       url: values.url,
       slug: values.slug,
       category_id: values.category_id,
+      is_featured: values.is_featured,
     })
     .eq("id", id)
     .select()
@@ -134,10 +137,22 @@ export const deleteGif = async (id: string) => {
   if (gifError) throw new Error(`Failed to delete GIF: ${gifError.message}`);
 };
 
-export const getFeaturedGifs = async (limit = 12): Promise<Gif[]> => {
+export const getLatestGifs = async (limit = 12): Promise<Gif[]> => {
   const { data, error } = await supabase
     .from("gifs")
     .select(BASE_GIF_QUERY)
+    .limit(limit)
+    .order("created_at", { ascending: false });
+    
+  if (error) throw new Error(error.message);
+  return (data as any) || [];
+};
+
+export const getFeaturedGifs = async (limit = 8): Promise<Gif[]> => {
+  const { data, error } = await supabase
+    .from("gifs")
+    .select(BASE_GIF_QUERY)
+    .eq('is_featured', true)
     .limit(limit)
     .order("created_at", { ascending: false });
     

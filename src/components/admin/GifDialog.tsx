@@ -25,6 +25,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -39,6 +40,7 @@ const formSchema = z.object({
   slug: z.string().min(3, "Slug must be at least 3 characters long."),
   category_id: z.string().uuid("Please select a category."),
   tags: z.array(z.string().uuid()).min(1, "Please select at least one tag."),
+  is_featured: z.boolean().default(false),
 });
 
 export type GifFormValues = z.infer<typeof formSchema>;
@@ -78,6 +80,7 @@ export function GifDialog({ children, gif, onSave, isSaving }: GifDialogProps) {
       slug: "",
       category_id: undefined,
       tags: [],
+      is_featured: false,
     },
   });
 
@@ -89,6 +92,7 @@ export function GifDialog({ children, gif, onSave, isSaving }: GifDialogProps) {
         slug: gif.slug,
         category_id: gif.category?.id,
         tags: gif.tags.map(t => t.id),
+        is_featured: gif.is_featured || false,
       });
     } else {
       form.reset({
@@ -97,6 +101,7 @@ export function GifDialog({ children, gif, onSave, isSaving }: GifDialogProps) {
         slug: "",
         category_id: undefined,
         tags: [],
+        is_featured: false,
       });
     }
   }, [gif, form]);
@@ -223,6 +228,24 @@ export function GifDialog({ children, gif, onSave, isSaving }: GifDialogProps) {
                     </select>
                   </FormControl>
                   <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="is_featured"
+              render={({ field }) => (
+                <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
+                  <div className="space-y-0.5">
+                    <FormLabel>Featured GIF</FormLabel>
+                    <FormMessage />
+                  </div>
+                  <FormControl>
+                    <Switch
+                      checked={field.value}
+                      onCheckedChange={field.onChange}
+                    />
+                  </FormControl>
                 </FormItem>
               )}
             />

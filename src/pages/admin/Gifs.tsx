@@ -4,7 +4,7 @@ import { Gif } from "@/types";
 import { DataTable } from "@/components/admin/DataTable";
 import { ColumnDef } from "@tanstack/react-table";
 import { Button } from "@/components/ui/button";
-import { ArrowUpDown, MoreHorizontal, PlusCircle, Edit, Trash2 } from "lucide-react";
+import { ArrowUpDown, MoreHorizontal, PlusCircle, Edit, Trash2, Star } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -113,6 +113,13 @@ const AdminGifsPage = () => {
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       ),
+    },
+    {
+      accessorKey: "is_featured",
+      header: "Featured",
+      cell: ({ row }) => {
+        return row.original.is_featured ? <Star className="h-4 w-4 text-yellow-500" /> : null;
+      },
     },
     {
       accessorKey: "category",
