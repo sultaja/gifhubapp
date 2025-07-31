@@ -22,32 +22,55 @@ const PageMetadata = () => {
 
   // Inject header and footer scripts
   useEffect(() => {
-    if (!isLoading && settings) {
-      const head = document.head;
-      const body = document.body;
-      const headerScriptsContainerId = 'header-scripts-container';
-      const footerScriptsContainerId = 'footer-scripts-container';
+    if (isLoading || !settings) {
+      return;
+    }
 
-      // Clear previous scripts
+    const headerScriptsContainerId = 'header-scripts-container';
+    const footerScriptsContainerId = 'footer-scripts-container';
+
+    // Cleanup function to remove scripts on re-render or unmount
+    const cleanup = () => {
       document.getElementById(headerScriptsContainerId)?.remove();
       document.getElementById(footerScriptsContainerId)?.remove();
+    };
+    cleanup(); // Clean up previous scripts first
 
-      // Inject header scripts
-      if (settings.header_scripts) {
-        const headerContainer = document.createElement('div');
-        headerContainer.id = headerScriptsContainerId;
-        headerContainer.innerHTML = settings.header_scripts;
-        head.appendChild(headerContainer);
-      }
+    const injectScripts = (scriptHTML: string, containerId: string, targetElement: HTMLElement) => {
+      const container = document.createElement('div');
+      container.id = containerId;
+      container.innerHTML = scriptHTML;
+      
+      const scripts = container.querySelectorAll('script');
+      scripts.forEach(oldScript => {
+        const newScript = document.createElement('script');
+        
+        // Copy attributes (src, async, defer, etc.)
+        Array.from(oldScript.attributes).forEach(attr => {
+          newScript.setAttribute(attr.name, attr.value);
+        });
+        
+        // Copy inline script content
+        if (oldScript.innerHTML) {
+          newScript.appendChild(document.createTextNode(oldScript.innerHTML));
+        }
+        
+        // Replace the old script tag with the new, executable one
+        oldScript.parentNode?.replaceChild(newScript, oldScript);
+      });
+      
+      targetElement.appendChild(container);
+    };
 
-      // Inject footer scripts
-      if (settings.footer_scripts) {
-        const footerContainer = document.createElement('div');
-        footerContainer.id = footerScriptsContainerId;
-        footerContainer.innerHTML = settings.footer_scripts;
-        body.appendChild(footerContainer);
-      }
+    if (settings.header_scripts) {
+      injectScripts(settings.header_scripts, headerScriptsContainerId, document.head);
     }
+
+    if (settings.footer_scripts) {
+      injectScripts(settings.footer_scripts, footerScriptsContainerId, document.body);
+    }
+
+    return cleanup; // Return cleanup function for React to call on unmount
   }, [settings, isLoading]);
 
   return null;
