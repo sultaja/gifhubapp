@@ -73,3 +73,14 @@ export interface UiTranslation {
   lang_code: string;
   translations: Record<string, any>;
 }
+
+export interface ContactSubmission {
+  id: number;
+  name: string;
+  email: string;
+  company?: string | null;
+  project_details?: string | null;
+  budget_range?: string | null;
+  is_read: boolean;
+  submitted_at: string;
+}

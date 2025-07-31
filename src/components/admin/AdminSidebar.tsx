@@ -1,6 +1,6 @@
 import { Link, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
-import { LayoutDashboard, GitFork, Tag, Settings, Home, FolderKanban, FileText, Languages } from "lucide-react";
+import { LayoutDashboard, GitFork, Tag, Settings, Home, FolderKanban, FileText, Languages, Mail } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 const AdminSidebar = () => {
@@ -12,6 +12,7 @@ const AdminSidebar = () => {
     { href: "/admin/gifs", label: t('admin.sidebar.gifs'), icon: GitFork },
     { href: "/admin/categories", label: t('admin.sidebar.categories'), icon: FolderKanban },
     { href: "/admin/tags", label: t('admin.sidebar.tags'), icon: Tag },
+    { href: "/admin/submissions", label: t('admin.sidebar.submissions'), icon: Mail },
     { href: "/admin/content", label: t('admin.sidebar.content'), icon: FileText },
     { href: "/admin/translations", label: t('admin.sidebar.translations'), icon: Languages },
     { href: "/admin/settings", label: t('admin.sidebar.settings'), icon: Settings },

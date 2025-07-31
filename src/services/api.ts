@@ -1,5 +1,5 @@
 import { supabase } from "@/integrations/supabase/client";
-import { Gif, Category, Tag, SiteSettings, CategoryTranslation, TagTranslation, GifTranslation, ContentSection, HierarchicalCategory, UiTranslation } from "@/types";
+import { Gif, Category, Tag, SiteSettings, CategoryTranslation, TagTranslation, GifTranslation, ContentSection, HierarchicalCategory, UiTranslation, ContactSubmission } from "@/types";
 import { GifFormValues } from "@/components/admin/GifDialog";
 
 // The base query for fetching GIFs with their related category and tags, now including translations
@@ -389,4 +389,33 @@ export const upsertUiTranslation = async (lang_code: string, translations: objec
         .single();
     if (error) throw new Error(error.message);
     return data;
+};
+
+// --- CONTACT SUBMISSIONS API ---
+export const getContactSubmissions = async (): Promise<ContactSubmission[]> => {
+    const { data, error } = await supabase.from('contact_submissions').select('*').order('submitted_at', { ascending: false });
+    if (error) throw new Error(error.message);
+    return data || [];
+};
+
+export const createContactSubmission = async (submission: Omit<ContactSubmission, 'id' | 'is_read' | 'submitted_at'>): Promise<ContactSubmission> => {
+    const { data, error } = await supabase.from('contact_submissions').insert(submission).select().single();
+    if (error) throw new Error(error.message);
+    return data;
+};
+
+export const updateContactSubmission = async (id: number, updates: Partial<ContactSubmission>): Promise<ContactSubmission> => {
+    const { data, error } = await supabase.from('contact_submissions').update(updates).eq('id', id).select().single();
+    if (error) throw new Error(error.message);
+    return data;
+};
+
+export const deleteContactSubmission = async (id: number) => {
+    const { error } = await supabase.from('contact_submissions').delete().eq('id', id);
+    if (error) throw new Error(error.message);
+};
+
+export const deleteContactSubmissions = async (ids: number[]) => {
+    const { error } = await supabase.from('contact_submissions').delete().in('id', ids);
+    if (error) throw new Error(error.message);
 };
