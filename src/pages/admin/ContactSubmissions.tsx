@@ -15,7 +15,7 @@ import { showSuccess, showError } from "@/utils/toast";
 import { useTranslation } from "react-i18next";
 import { format } from "date-fns";
 
-const AdminSubmissionsPage = () => {
+const AdminContactSubmissionsPage = () => {
   const queryClient = useQueryClient();
   const { t } = useTranslation();
   const [sorting, setSorting] = React.useState<SortingState>([{ id: "submitted_at", desc: true }]);
@@ -218,4 +218,4 @@ const AdminSubmissionsPage = () => {
   );
 };
 
-export default AdminSubmissionsPage;
+export default AdminContactSubmissionsPage;

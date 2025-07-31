@@ -48,6 +48,8 @@ export interface Gif {
   category: Category | null;
   submittedBy?: string;
   is_featured?: boolean;
+  is_approved: boolean;
+  created_at?: string;
   gif_translations: GifTranslation[];
 }
 

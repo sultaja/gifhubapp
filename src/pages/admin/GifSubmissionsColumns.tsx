@@ -1,7 +1,6 @@
 import { ColumnDef } from "@tanstack/react-table";
-import { GifWithRelations } from "@/types";
+import { Gif } from "@/types";
 import { Badge } from "@/components/ui/badge";
-import { DataTableColumnHeader } from "@/components/ui/data-table-column-header";
 import { formatDistanceToNow } from "date-fns";
 import { useTranslation } from "react-i18next";
 import { useQueryClient } from "@tanstack/react-query";
@@ -9,9 +8,20 @@ import { useSaveGif, useDeleteGif } from "@/hooks/useAdminGifs";
 import { GifDialog, GifFormValues } from "@/components/admin/GifDialog";
 import { Button } from "@/components/ui/button";
 import { showSuccess, showError } from "@/utils/toast";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"
 
 const ActionsCell = ({ row }: { row: any }) => {
-  const gif = row.original as GifWithRelations;
+  const gif = row.original as Gif;
   const { t } = useTranslation();
   const queryClient = useQueryClient();
 
@@ -26,27 +36,25 @@ const ActionsCell = ({ row }: { row: any }) => {
     };
     saveGifMutation.mutate(payload, {
       onSuccess: () => {
-        showSuccess(t("admin_submissions.toast.approved"));
+        showSuccess(t("admin.gif_submissions.toast.approved"));
         queryClient.invalidateQueries({ queryKey: ["pendingGifs"] });
         queryClient.invalidateQueries({ queryKey: ["gifs"] });
       },
       onError: (error) => {
-        showError(error.message || t("admin_submissions.toast.error_approve"));
+        showError(error.message || t("admin.gif_submissions.toast.error_approve"));
       },
     });
   };
 
   const handleReject = () => {
-    if (window.confirm(t("admin_submissions.confirm_reject"))) {
-      deleteGifMutation.mutate(gif.id, {
-        onSuccess: () => {
-          showSuccess(t("admin_submissions.toast.rejected"));
-        },
-        onError: (error) => {
-          showError(error.message || t("admin_submissions.toast.error_reject"));
-        },
-      });
-    }
+    deleteGifMutation.mutate(gif.id, {
+      onSuccess: () => {
+        showSuccess(t("admin.gif_submissions.toast.rejected"));
+      },
+      onError: (error) => {
+        showError(error.message || t("admin.gif_submissions.toast.error_reject"));
+      },
+    });
   };
 
   return (
@@ -57,25 +65,42 @@ const ActionsCell = ({ row }: { row: any }) => {
         isSaving={saveGifMutation.isPending}
       >
         <Button variant="outline" size="sm">
-          {t("admin_submissions.approve_button")}
+          {t("admin.gif_submissions.approve_button")}
         </Button>
       </GifDialog>
-      <Button
-        variant="destructive"
-        size="sm"
-        onClick={handleReject}
-        disabled={deleteGifMutation.isPending}
-      >
-        {t("admin_submissions.reject_button")}
-      </Button>
+      <AlertDialog>
+        <AlertDialogTrigger asChild>
+            <Button
+                variant="destructive"
+                size="sm"
+                disabled={deleteGifMutation.isPending}
+            >
+                {t("admin.gif_submissions.reject_button")}
+            </Button>
+        </AlertDialogTrigger>
+        <AlertDialogContent>
+            <AlertDialogHeader>
+            <AlertDialogTitle>{t('admin.dialog_shared.are_you_sure')}</AlertDialogTitle>
+            <AlertDialogDescription>
+                {t('admin.gif_submissions.confirm_reject')}
+            </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+            <AlertDialogCancel>{t('admin.dialog_shared.cancel')}</AlertDialogCancel>
+            <AlertDialogAction onClick={handleReject}>
+                {t('admin.dialog_shared.continue')}
+            </AlertDialogAction>
+            </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
 
-export const columns: ColumnDef<GifWithRelations>[] = [
+export const columns: ColumnDef<Gif>[] = [
   {
     accessorKey: "url",
-    header: ({ t }) => t("admin_submissions.columns.gif"),
+    header: "GIF",
     cell: ({ row }) => (
       <img
         src={row.original.url}
@@ -87,20 +112,18 @@ export const columns: ColumnDef<GifWithRelations>[] = [
   },
   {
     accessorKey: "title",
-    header: ({ column, t }) => (
-      <DataTableColumnHeader column={column} title={t("admin_submissions.columns.title")} />
-    ),
+    header: "Title",
   },
   {
     accessorKey: "category",
-    header: ({ t }) => t("admin_submissions.columns.category"),
+    header: "Category",
     cell: ({ row }) => row.original.category?.name || "N/A",
   },
   {
     accessorKey: "tags",
-    header: ({ t }) => t("admin_submissions.columns.tags"),
+    header: "Tags",
     cell: ({ row }) => (
-      <div className="flex flex-wrap gap-1">
+      <div className="flex flex-wrap gap-1 max-w-xs">
         {row.original.tags.slice(0, 3).map((tag) => (
           <Badge key={tag.id} variant="secondary">
             {tag.name}
@@ -115,10 +138,9 @@ export const columns: ColumnDef<GifWithRelations>[] = [
   },
   {
     accessorKey: "created_at",
-    header: ({ column, t }) => (
-      <DataTableColumnHeader column={column} title={t("admin_submissions.columns.submitted_at")} />
-    ),
+    header: "Submitted",
     cell: ({ row }) => {
+      if (!row.original.created_at) return null;
       const date = new Date(row.original.created_at);
       return (
         <span>

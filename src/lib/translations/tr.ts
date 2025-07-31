@@ -60,6 +60,7 @@ export const tr = {
       submit_error: "GIF gönderilemedi. Lütfen tekrar deneyin.",
       tags_error: "GIF'inize etiket eklenemedi. Lütfen tekrar deneyin.",
       success: "GIF başarıyla gönderildi! Kısa süre içinde incelenecektir.",
+      pending_success: "GIF başarıyla gönderildi! Bir yönetici tarafından incelenecektir.",
     },
   },
   contact_page: {
@@ -118,7 +119,8 @@ export const tr = {
       gifs: "GIF'ler",
       categories: "Kategoriler",
       tags: "Etiketler",
-      submissions: "Gönderimler",
+      contact_submissions: "İletişim Gönderimleri",
+      gif_submissions: "GIF Gönderimleri",
       content: "İçerik",
       translations: "Çeviriler",
       settings: "Ayarlar",
@@ -196,6 +198,21 @@ export const tr = {
       delete_many_confirm: "{{count}} gönderim kalıcı olarak silinecek.",
       toast_delete_success: "Gönderim başarıyla silindi!",
       toast_delete_many_success: "Seçili gönderimler başarıyla silindi!",
+    },
+    gif_submissions: {
+      title: "GIF Gönderimleri",
+      description: "Kullanıcı tarafından gönderilen GIF'leri inceleyin, onaylayın veya reddedin.",
+      empty_state: "Bekleyen gönderim yok.",
+      fetch_error: "Gönderimler alınamadı",
+      approve_button: "İncele ve Onayla",
+      reject_button: "Reddet",
+      confirm_reject: "Bu, gönderilen GIF'i kalıcı olarak silecektir. Bu işlem geri alınamaz.",
+      toast: {
+        approved: "GIF onaylandı ve yayınlandı!",
+        rejected: "GIF gönderimi reddedildi ve silindi.",
+        error_approve: "GIF onaylanamadı.",
+        error_reject: "GIF reddedilemedi.",
+      }
     },
     content: {
       title: "Sayfa İçeriğini Yönet",

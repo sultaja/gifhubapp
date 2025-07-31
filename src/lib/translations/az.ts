@@ -60,6 +60,7 @@ export const az = {
       submit_error: "GIF göndərilə bilmədi. Zəhmət olmasa yenidən cəhd edin.",
       tags_error: "GIF'inizə etiketlər əlavə edilə bilmədi. Zəhmət olmasa yenidən cəhd edin.",
       success: "GIF uğurla göndərildi! Tezliklə nəzərdən keçiriləcək.",
+      pending_success: "GIF uğurla göndərildi! Bir admin tərəfindən nəzərdən keçiriləcək.",
     },
   },
   contact_page: {
@@ -118,7 +119,8 @@ export const az = {
       gifs: "GIF'lər",
       categories: "Kateqoriyalar",
       tags: "Etiketlər",
-      submissions: "Müraciətlər",
+      contact_submissions: "Əlaqə Müraciətləri",
+      gif_submissions: "GIF Müraciətləri",
       content: "Məzmun",
       translations: "Tərcümələr",
       settings: "Parametrlər",
@@ -196,6 +198,21 @@ export const az = {
       delete_many_confirm: "{{count}} müraciət qalıcı olaraq silinəcək.",
       toast_delete_success: "Müraciət uğurla silindi!",
       toast_delete_many_success: "Seçilmiş müraciətlər uğurla silindi!",
+    },
+    gif_submissions: {
+      title: "GIF Müraciətləri",
+      description: "İstifadəçi tərəfindən göndərilən GIF'ləri nəzərdən keçirin, təsdiqləyin və ya rədd edin.",
+      empty_state: "Gözləyən müraciət yoxdur.",
+      fetch_error: "Müraciətlər gətirilə bilmədi",
+      approve_button: "Nəzərdən Keçir və Təsdiqlə",
+      reject_button: "Rədd et",
+      confirm_reject: "Bu, göndərilən GIF'i qalıcı olaraq siləcək. Bu əməliyyat geri qaytarıla bilməz.",
+      toast: {
+        approved: "GIF təsdiqləndi və yayımlandı!",
+        rejected: "GIF müraciəti rədd edildi və silindi.",
+        error_approve: "GIF təsdiqlənə bilmədi.",
+        error_reject: "GIF rədd edilə bilmədi.",
+      }
     },
     content: {
       title: "Səhifə Məzmununu İdarə Et",

@@ -21,7 +21,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { getCategories, getTags } from "@/services/api";
 import { showSuccess, showError, showLoading, dismissToast } from "@/utils/toast";
 import { Category, Tag } from "@/types";
@@ -37,7 +37,6 @@ const formSchema = z.object({
 
 const SubmitGifPage = () => {
   const navigate = useNavigate();
-  const queryClient = useQueryClient();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { t } = useTranslation();
 
@@ -77,6 +76,7 @@ const SubmitGifPage = () => {
         url: values.url,
         slug: `${slug}-${Date.now()}`, // Ensure unique slug
         category_id: values.category_id,
+        is_approved: false,
       })
       .select()
       .single();
@@ -105,9 +105,8 @@ const SubmitGifPage = () => {
     }
 
     dismissToast(toastId);
-    showSuccess(t('submit_page.toast.success'));
-    queryClient.invalidateQueries({ queryKey: ['featuredGifs'] });
-    navigate(`/gif/${gifData.slug}`);
+    showSuccess(t('submit_page.toast.pending_success'));
+    navigate(`/`);
   };
 
   return (

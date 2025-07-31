@@ -33,10 +33,22 @@ export const getGifs = async (): Promise<Gif[]> => {
   return data.map(mapGifData);
 };
 
+export const getPendingGifs = async (): Promise<Gif[]> => {
+  const { data, error } = await supabase
+    .from("gifs")
+    .select('*, categories(*, category_translations(*)), gif_tags(tags(*, tag_translations(*))), gif_translations(*)')
+    .eq('is_approved', false)
+    .order("created_at", { ascending: true });
+
+  if (error) throw new Error(error.message);
+  return data.map(mapGifData);
+};
+
 export const getLatestGifs = async (limit: number = 12): Promise<Gif[]> => {
   const { data, error } = await supabase
     .from("gifs")
     .select('*, categories(*, category_translations(*)), gif_tags(tags(*, tag_translations(*))), gif_translations(*)')
+    .eq('is_approved', true)
     .order("created_at", { ascending: false })
     .limit(limit);
 
@@ -49,6 +61,7 @@ export const getFeaturedGifs = async (limit: number = 8): Promise<Gif[]> => {
     .from("gifs")
     .select('*, categories(*, category_translations(*)), gif_tags(tags(*, tag_translations(*))), gif_translations(*)')
     .eq("is_featured", true)
+    .eq('is_approved', true)
     .order("created_at", { ascending: false })
     .limit(limit);
 
@@ -61,6 +74,7 @@ export const getGifBySlug = async (slug: string): Promise<Gif> => {
     .from("gifs")
     .select('*, categories(*, category_translations(*)), gif_tags(tags(*, tag_translations(*))), gif_translations(*)')
     .eq("slug", slug)
+    .eq('is_approved', true)
     .single();
 
   if (error) throw new Error(error.message);
@@ -90,6 +104,7 @@ export const getGifsByCategorySlug = async (slug: string) => {
     .from('gifs')
     .select('*, categories!inner(*, category_translations(*)), gif_tags(tags(*, tag_translations(*))), gif_translations(*)')
     .in('category_id', categoryIds)
+    .eq('is_approved', true)
     .order('created_at', { ascending: false });
 
   if (gifsError) throw new Error(gifsError.message);
@@ -109,8 +124,9 @@ export const getGifsByTagSlug = async (slug: string) => {
 
   const { data, error: gifsError } = await supabase
     .from('gif_tags')
-    .select('gifs(*, categories(*, category_translations(*)), gif_tags(tags(*, tag_translations(*))), gif_translations(*))')
-    .eq('tag_id', tag.id);
+    .select('gifs!inner(*, categories(*, category_translations(*)), gif_tags(tags(*, tag_translations(*))), gif_translations(*))')
+    .eq('tag_id', tag.id)
+    .eq('gifs.is_approved', true);
 
   if (gifsError) throw new Error(gifsError.message);
 
@@ -130,7 +146,8 @@ export const searchGifs = async (searchTerm: string): Promise<Gif[]> => {
   const { data: gifs, error: gifsError } = await supabase
     .from('gifs')
     .select('*, categories(*, category_translations(*)), gif_tags(tags(*, tag_translations(*))), gif_translations(*)')
-    .in('id', gifIds);
+    .in('id', gifIds)
+    .eq('is_approved', true);
 
   if (gifsError) throw new Error(gifsError.message);
 
@@ -177,7 +194,7 @@ export const getTags = async (): Promise<Tag[]> => {
 };
 
 export const getStats = async () => {
-  const { count: gifsCount, error: gifsError } = await supabase.from('gifs').select('*', { count: 'exact', head: true });
+  const { count: gifsCount, error: gifsError } = await supabase.from('gifs').select('*', { count: 'exact', head: true }).eq('is_approved', true);
   const { count: categoriesCount, error: categoriesError } = await supabase.from('categories').select('*', { count: 'exact', head: true });
   const { count: tagsCount, error: tagsError } = await supabase.from('tags').select('*', { count: 'exact', head: true });
 

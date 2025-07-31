@@ -60,6 +60,7 @@ export const ru = {
       submit_error: "Не удалось отправить GIF. Пожалуйста, попробуйте еще раз.",
       tags_error: "Не удалось добавить теги к вашему GIF. Пожалуйста, попробуйте еще раз.",
       success: "GIF успешно отправлен! Он будет рассмотрен в ближайшее время.",
+      pending_success: "GIF успешно отправлен! Он будет рассмотрен администратором.",
     },
   },
   contact_page: {
@@ -118,7 +119,8 @@ export const ru = {
       gifs: "GIFs",
       categories: "Категории",
       tags: "Теги",
-      submissions: "Заявки",
+      contact_submissions: "Контактные заявки",
+      gif_submissions: "Заявки GIF",
       content: "Контент",
       translations: "Переводы",
       settings: "Настройки",
@@ -196,6 +198,21 @@ export const ru = {
       delete_many_confirm: "Это действие навсегда удалит {{count}} заявку(и).",
       toast_delete_success: "Заявка успешно удалена!",
       toast_delete_many_success: "Выбранные заявки успешно удалены!",
+    },
+    gif_submissions: {
+      title: "Заявки GIF",
+      description: "Просматривайте и одобряйте или отклоняйте GIF, отправленные пользователями.",
+      empty_state: "Нет ожидающих заявок.",
+      fetch_error: "Не удалось загрузить заявки",
+      approve_button: "Проверить и одобрить",
+      reject_button: "Отклонить",
+      confirm_reject: "Это действие навсегда удалит отправленный GIF. Это действие необратимо.",
+      toast: {
+        approved: "GIF одобрен и опубликован!",
+        rejected: "Заявка на GIF отклонена и удалена.",
+        error_approve: "Не удалось одобрить GIF.",
+        error_reject: "Не удалось отклонить GIF.",
+      }
     },
     content: {
       title: "Управление контентом страниц",

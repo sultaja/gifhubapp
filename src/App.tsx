@@ -25,7 +25,8 @@ import Dashboard from "./pages/admin/Dashboard";
 import AdminGifsPage from "./pages/admin/Gifs";
 import AdminCategoriesPage from "./pages/admin/Categories";
 import AdminTagsPage from "./pages/admin/Tags";
-import AdminSubmissionsPage from "./pages/admin/Submissions";
+import AdminContactSubmissionsPage from "./pages/admin/ContactSubmissions";
+import AdminGifSubmissionsPage from "./pages/admin/GifSubmissions";
 import AdminContentPage from "./pages/admin/Content";
 import AdminTranslationsPage from "./pages/admin/Translations";
 import AdminSettingsPage from "./pages/admin/Settings";
@@ -58,7 +59,8 @@ const App = () => (
                 <Route path="gifs" element={<AdminGifsPage />} />
                 <Route path="categories" element={<AdminCategoriesPage />} />
                 <Route path="tags" element={<AdminTagsPage />} />
-                <Route path="submissions" element={<AdminSubmissionsPage />} />
+                <Route path="contact-submissions" element={<AdminContactSubmissionsPage />} />
+                <Route path="gif-submissions" element={<AdminGifSubmissionsPage />} />
                 <Route path="content" element={<AdminContentPage />} />
                 <Route path="translations" element={<AdminTranslationsPage />} />
                 <Route path="settings" element={<AdminSettingsPage />} />

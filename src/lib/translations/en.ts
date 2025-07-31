@@ -60,6 +60,7 @@ export const en = {
       submit_error: "Failed to submit GIF. Please try again.",
       tags_error: "Failed to add tags to your GIF. Please try again.",
       success: "GIF submitted successfully! It will be reviewed shortly.",
+      pending_success: "GIF submitted successfully! It will be reviewed by an admin.",
     },
   },
   contact_page: {
@@ -118,7 +119,8 @@ export const en = {
       gifs: "GIFs",
       categories: "Categories",
       tags: "Tags",
-      submissions: "Submissions",
+      contact_submissions: "Contact Submissions",
+      gif_submissions: "GIF Submissions",
       content: "Content",
       translations: "Translations",
       settings: "Settings",
@@ -196,6 +198,21 @@ export const en = {
       delete_many_confirm: "This will permanently delete {{count}} submission(s).",
       toast_delete_success: "Submission deleted successfully!",
       toast_delete_many_success: "Selected submissions deleted successfully!",
+    },
+    gif_submissions: {
+      title: "GIF Submissions",
+      description: "Review and approve or reject user-submitted GIFs.",
+      empty_state: "No pending submissions.",
+      fetch_error: "Failed to fetch submissions",
+      approve_button: "Review & Approve",
+      reject_button: "Reject",
+      confirm_reject: "This will permanently delete the submitted GIF. This action cannot be undone.",
+      toast: {
+        approved: "GIF approved and published!",
+        rejected: "GIF submission rejected and deleted.",
+        error_approve: "Failed to approve GIF.",
+        error_reject: "Failed to reject GIF.",
+      }
     },
     content: {
       title: "Manage Page Content",
