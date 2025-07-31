@@ -252,7 +252,7 @@ const AdminTagsPage = () => {
           <div className="w-full text-center p-4">Loading Tags...</div>
         </div>
       )}
-      {!isLoading && <DataTable columns={columns} data={tags || []} />}
+      {!isLoading && <DataTable table={table} columns={columns} />}
     </div>
   );
 };

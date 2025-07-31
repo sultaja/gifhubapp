@@ -267,7 +267,7 @@ const AdminCategoriesPage = () => {
           <div className="w-full text-center p-4">Loading Categories...</div>
         </div>
       )}
-      {!isLoading && <DataTable columns={columns} data={categories || []} />}
+      {!isLoading && <DataTable table={table} columns={columns} />}
     </div>
   );
 };

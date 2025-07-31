@@ -3,7 +3,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { getGifs, createGif, updateGif, deleteGif, deleteGifs } from "@/services/api";
 import { Gif } from "@/types";
 import { DataTable } from "@/components/admin/DataTable";
-import { ColumnDef, RowSelectionState, SortingState, useReactTable, getCoreRowModel, getPaginationRowModel, getSortedRowModel } from "@tanstack/react-table";
+import { ColumnDef, RowSelectionState, SortingState, useReactTable, getCoreRowModel, getPaginationRowModel, getSortedRowModel, flexRender } from "@tanstack/react-table";
 import { Button } from "@/components/ui/button";
 import { ArrowUpDown, MoreHorizontal, PlusCircle, Edit, Trash2, Star, Languages } from "lucide-react";
 import {
@@ -282,7 +282,7 @@ const AdminGifsPage = () => {
           <div className="w-full text-center p-4">Loading GIFs...</div>
         </div>
       )}
-      {!isLoading && <DataTable columns={columns} data={gifs || []} />}
+      {!isLoading && <DataTable table={table} columns={columns} />}
     </div>
   );
 };

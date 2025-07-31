@@ -1,10 +1,7 @@
 import * as React from "react"
 import {
-  ColumnDef,
   flexRender,
-  getCoreRowModel,
-  getPaginationRowModel,
-  useReactTable,
+  Table as TanstackTable,
 } from "@tanstack/react-table"
 
 import {
@@ -17,22 +14,15 @@ import {
 } from "@/components/ui/table"
 import { Button } from "@/components/ui/button"
 
-interface DataTableProps<TData, TValue> {
-  columns: ColumnDef<TData, TValue>[]
-  data: TData[]
+interface DataTableProps<TData> {
+  table: TanstackTable<TData>
+  columns: any[] // Pass columns length for colspan
 }
 
-export function DataTable<TData, TValue>({
+export function DataTable<TData>({
+  table,
   columns,
-  data,
-}: DataTableProps<TData, TValue>) {
-  const table = useReactTable({
-    data,
-    columns,
-    getCoreRowModel: getCoreRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
-  })
-
+}: DataTableProps<TData>) {
   return (
     <div>
       <div className="rounded-md border">
