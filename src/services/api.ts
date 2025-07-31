@@ -51,7 +51,8 @@ export const getHierarchicalCategories = async (): Promise<HierarchicalCategory[
 };
 
 export const createCategory = async (category: Omit<Category, 'id'>): Promise<Category> => {
-    const { data, error } = await supabase.from('categories').insert(category).select(BASE_CATEGORY_QUERY).single();
+    const { category_translations, ...categoryDataForDb } = category;
+    const { data, error } = await supabase.from('categories').insert(categoryDataForDb).select(BASE_CATEGORY_QUERY).single();
     if (error) throw new Error(error.message);
     return data;
 };
@@ -81,7 +82,8 @@ export const getTags = async (): Promise<Tag[]> => {
 };
 
 export const createTag = async (tag: Omit<Tag, 'id'>): Promise<Tag> => {
-    const { data, error } = await supabase.from('tags').insert(tag).select().single();
+    const { tag_translations, ...tagDataForDb } = tag;
+    const { data, error } = await supabase.from('tags').insert(tagDataForDb).select('*, tag_translations(*)').single();
     if (error) throw new Error(error.message);
     return data;
 };
