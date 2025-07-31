@@ -47,7 +47,7 @@ const AdminCategoriesPage = () => {
   };
 
   const createMutation = useMutation({
-    mutationFn: (newCategory: Omit<Category, 'id'>) => createCategory(newCategory),
+    mutationFn: (newCategory: Omit<Category, 'id' | 'category_translations'> & { category_translations: [] }) => createCategory(newCategory),
     ...mutationOptions,
     onSuccess: () => {
       mutationOptions.onSuccess();
@@ -77,7 +77,8 @@ const AdminCategoriesPage = () => {
     if (categoryId) {
       updateMutation.mutate({ id: categoryId, values });
     } else {
-      createMutation.mutate(values);
+      // Add the required 'category_translations' property when creating a new category
+      createMutation.mutate({ ...values, category_translations: [] });
     }
   };
 

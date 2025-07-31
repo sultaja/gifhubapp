@@ -1,24 +1,21 @@
 import * as Icons from 'lucide-react';
 
-// Get all icon names from lucide-react
-type IconName = keyof typeof Icons;
-
 interface DynamicIconProps {
-  name: string; // Accept string
+  name: string;
   className?: string;
 }
 
 const DynamicIcon = ({ name, className }: DynamicIconProps) => {
-  // Check if the provided name is a valid icon name
-  const iconName = name as IconName;
-  if (!iconName || !(iconName in Icons)) {
-    // Return a default icon or null if the icon name is invalid
-    return <Icons.Image className={className} />;
+  // Use 'any' to bypass strict type checking for dynamic keys on the Icons module.
+  // This resolves the issue where TypeScript can't guarantee that every key corresponds to a renderable component.
+  const IconComponent = (Icons as any)[name];
+
+  if (IconComponent) {
+    return <IconComponent className={className} />;
   }
   
-  const IconComponent = Icons[iconName];
-
-  return <IconComponent className={className} />;
+  // Return a default icon if the icon name is invalid or not found
+  return <Icons.Image className={className} />;
 };
 
 export default DynamicIcon;

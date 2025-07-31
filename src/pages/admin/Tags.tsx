@@ -47,7 +47,7 @@ const AdminTagsPage = () => {
   };
 
   const createMutation = useMutation({
-    mutationFn: (newTag: Omit<Tag, 'id'>) => createTag(newTag),
+    mutationFn: (newTag: Omit<Tag, 'id' | 'tag_translations'> & { tag_translations: [] }) => createTag(newTag),
     ...mutationOptions,
     onSuccess: () => {
       mutationOptions.onSuccess();
@@ -77,7 +77,8 @@ const AdminTagsPage = () => {
     if (tagId) {
       updateMutation.mutate({ id: tagId, values });
     } else {
-      createMutation.mutate(values);
+      // Add the required 'tag_translations' property when creating a new tag
+      createMutation.mutate({ ...values, tag_translations: [] });
     }
   };
 
