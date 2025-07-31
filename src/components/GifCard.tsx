@@ -2,7 +2,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Gif } from "@/types";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { getTranslatedTitle } from "@/lib/translations";
+import { getTranslatedTitle } from "@/lib/translationUtils";
 
 interface GifCardProps {
   gif: Gif;

@@ -10,7 +10,7 @@ import { useQuery } from "@tanstack/react-query";
 import { getGifBySlug } from "@/services/api";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useTranslation } from "react-i18next";
-import { getTranslatedTitle, getTranslatedName } from "@/lib/translations";
+import { getTranslatedTitle, getTranslatedName } from "@/lib/translationUtils";
 
 const GifPage = () => {
   const { slug } = useParams<{ slug: string }>();

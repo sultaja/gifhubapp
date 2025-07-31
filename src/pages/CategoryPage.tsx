@@ -6,7 +6,7 @@ import { useQuery } from "@tanstack/react-query";
 import { getGifsByCategorySlug } from "@/services/api";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useTranslation } from "react-i18next";
-import { getTranslatedName } from "@/lib/translations";
+import { getTranslatedName } from "@/lib/translationUtils";
 
 const CategoryPage = () => {
   const { slug } = useParams<{ slug: string }>();

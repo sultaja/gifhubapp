@@ -9,7 +9,7 @@ import { getHierarchicalCategories, getLatestGifs, getFeaturedGifs } from "@/ser
 import { Skeleton } from "@/components/ui/skeleton";
 import DynamicIcon from "@/components/DynamicIcon";
 import { useTranslation } from "react-i18next";
-import { getTranslatedName } from "@/lib/translations";
+import { getTranslatedName } from "@/lib/translationUtils";
 
 const Index = () => {
   const [searchTerm, setSearchTerm] = useState("");
