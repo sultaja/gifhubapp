@@ -8,7 +8,7 @@ import { showSuccess, showError } from "@/utils/toast";
 import { supportedLngs } from "@/i18n";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useEffect, useState } from "react";
-import { defaultTranslations } from "@/lib/default-translations";
+import { defaultTranslations } from "@/lib/translations";
 import { useTranslation } from "react-i18next";
 
 const AdminTranslationsPage = () => {

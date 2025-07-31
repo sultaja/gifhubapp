@@ -2,7 +2,7 @@ import i18n from "i18next";
 import { initReactI18next } from "react-i18next";
 import LanguageDetector from "i18next-browser-languagedetector";
 import { getUiTranslations, upsertUiTranslation } from "./services/api";
-import { defaultTranslations } from "./lib/default-translations";
+import { resources, defaultTranslations } from "./lib/translations";
 
 export const supportedLngs = {
   en: "English",
@@ -25,7 +25,7 @@ i18n
       useSuspense: false,
     },
     // Load default translations immediately
-    resources: defaultTranslations,
+    resources,
   });
 
 // Fetch translations from the database and merge them
@@ -35,7 +35,7 @@ getUiTranslations().then(async (dbTranslations) => {
     if (dbTranslations.length === 0) {
       console.log("No UI translations found in DB, seeding with defaults...");
       const seedingPromises = Object.entries(defaultTranslations).map(([lang, content]) => {
-        return upsertUiTranslation(lang, content);
+        return upsertUiTranslation(lang, content as object);
       });
       try {
         await Promise.all(seedingPromises);
