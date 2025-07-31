@@ -1,8 +1,9 @@
+import * as React from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { getGifs, createGif, updateGif, deleteGif } from "@/services/api";
+import { getGifs, createGif, updateGif, deleteGif, deleteGifs } from "@/services/api";
 import { Gif } from "@/types";
 import { DataTable } from "@/components/admin/DataTable";
-import { ColumnDef } from "@tanstack/react-table";
+import { ColumnDef, RowSelectionState, SortingState, useReactTable, getCoreRowModel, getPaginationRowModel, getSortedRowModel } from "@tanstack/react-table";
 import { Button } from "@/components/ui/button";
 import { ArrowUpDown, MoreHorizontal, PlusCircle, Edit, Trash2, Star, Languages } from "lucide-react";
 import {
@@ -32,6 +33,8 @@ import { TranslationDialog } from "@/components/admin/TranslationDialog";
 
 const AdminGifsPage = () => {
   const queryClient = useQueryClient();
+  const [sorting, setSorting] = React.useState<SortingState>([]);
+  const [rowSelection, setRowSelection] = React.useState<RowSelectionState>({});
 
   const { data: gifs, isLoading } = useQuery({
     queryKey: ["adminGifs"],
@@ -42,6 +45,7 @@ const AdminGifsPage = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["adminGifs"] });
       queryClient.invalidateQueries({ queryKey: ["adminStats"] });
+      setRowSelection({});
     },
     onError: (error: Error) => {
       showError(error.message);
@@ -51,8 +55,8 @@ const AdminGifsPage = () => {
   const createMutation = useMutation({
     mutationFn: (newGif: GifFormValues) => createGif(newGif),
     ...mutationOptions,
-    onSuccess: () => {
-      mutationOptions.onSuccess();
+    onSuccess: (...args) => {
+      mutationOptions.onSuccess(...args);
       showSuccess("GIF created successfully!");
     }
   });
@@ -60,8 +64,8 @@ const AdminGifsPage = () => {
   const updateMutation = useMutation({
     mutationFn: ({ id, values }: { id: string, values: GifFormValues }) => updateGif(id, values),
     ...mutationOptions,
-    onSuccess: () => {
-      mutationOptions.onSuccess();
+    onSuccess: (...args) => {
+      mutationOptions.onSuccess(...args);
       showSuccess("GIF updated successfully!");
     }
   });
@@ -69,9 +73,18 @@ const AdminGifsPage = () => {
   const deleteMutation = useMutation({
     mutationFn: (id: string) => deleteGif(id),
     ...mutationOptions,
-    onSuccess: () => {
-      mutationOptions.onSuccess();
+    onSuccess: (...args) => {
+      mutationOptions.onSuccess(...args);
       showSuccess("GIF deleted successfully!");
+    }
+  });
+
+  const deleteManyMutation = useMutation({
+    mutationFn: (ids: string[]) => deleteGifs(ids),
+    ...mutationOptions,
+    onSuccess: (...args) => {
+      mutationOptions.onSuccess(...args);
+      showSuccess("Selected GIFs deleted successfully!");
     }
   });
 
@@ -211,25 +224,65 @@ const AdminGifsPage = () => {
     },
   ];
 
-  const tableData = isLoading ? [] : gifs || [];
+  const table = useReactTable({
+    data: gifs || [],
+    columns,
+    onSortingChange: setSorting,
+    onRowSelectionChange: setRowSelection,
+    getCoreRowModel: getCoreRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+    state: {
+      sorting,
+      rowSelection,
+    },
+  });
+
+  const selectedIds = table.getSelectedRowModel().rows.map(row => row.original.id);
 
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-3xl font-bold">Manage GIFs</h1>
-        <GifDialog onSave={handleSave} isSaving={createMutation.isPending}>
-          <Button>
-            <PlusCircle className="mr-2 h-4 w-4" />
-            Add New GIF
-          </Button>
-        </GifDialog>
+        <div className="flex items-center space-x-2">
+          {selectedIds.length > 0 && (
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button variant="destructive">
+                  <Trash2 className="mr-2 h-4 w-4" />
+                  Delete ({selectedIds.length})
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    This action cannot be undone. This will permanently delete {selectedIds.length} GIF(s).
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogAction onClick={() => deleteManyMutation.mutate(selectedIds)}>
+                    Continue
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          )}
+          <GifDialog onSave={handleSave} isSaving={createMutation.isPending}>
+            <Button>
+              <PlusCircle className="mr-2 h-4 w-4" />
+              Add New GIF
+            </Button>
+          </GifDialog>
+        </div>
       </div>
       {isLoading && (
         <div className="rounded-md border p-4">
           <div className="w-full text-center p-4">Loading GIFs...</div>
         </div>
       )}
-      {!isLoading && <DataTable columns={columns} data={tableData} />}
+      {!isLoading && <DataTable columns={columns} data={gifs || []} />}
     </div>
   );
 };

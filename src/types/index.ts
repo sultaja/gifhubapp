@@ -68,3 +68,8 @@ export interface ContentSection {
   meta_title?: string | null;
   meta_description?: string | null;
 }
+
+export interface UiTranslation {
+  lang_code: string;
+  translations: Record<string, any>;
+}

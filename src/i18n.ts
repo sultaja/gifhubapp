@@ -1,7 +1,7 @@
 import i18n from "i18next";
 import { initReactI18next } from "react-i18next";
 import LanguageDetector from "i18next-browser-languagedetector";
-import HttpApi from "i18next-http-backend";
+import { getUiTranslations } from "./services/api";
 
 export const supportedLngs = {
   en: "English",
@@ -11,7 +11,6 @@ export const supportedLngs = {
 };
 
 i18n
-  .use(HttpApi)
   .use(LanguageDetector)
   .use(initReactI18next)
   .init({
@@ -21,12 +20,20 @@ i18n
       order: ["path", "cookie", "htmlTag", "localStorage", "subdomain"],
       caches: ["cookie"],
     },
-    backend: {
-      loadPath: "/locales/{{lng}}/translation.json",
-    },
     react: {
-      useSuspense: true,
+      useSuspense: false, // Set to false as we handle loading state ourselves
     },
   });
+
+// Fetch translations from the database and load them into i18next
+getUiTranslations().then(translations => {
+  if (translations) {
+    translations.forEach(t => {
+      i18n.addResourceBundle(t.lang_code, 'translation', t.translations, true, true);
+    });
+    // This ensures the app re-renders with the loaded translations
+    i18n.changeLanguage(i18n.language);
+  }
+});
 
 export default i18n;

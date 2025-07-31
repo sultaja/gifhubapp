@@ -31,6 +31,7 @@ import AdminCategoriesPage from "./pages/admin/Categories";
 import AdminTagsPage from "./pages/admin/Tags";
 import AdminSettingsPage from "./pages/admin/Settings";
 import AdminContentPage from "./pages/admin/Content";
+import AdminTranslationsPage from "./pages/admin/Translations";
 
 
 const queryClient = new QueryClient();
@@ -66,6 +67,7 @@ const App = () => (
                 <Route path="categories" element={<AdminCategoriesPage />} />
                 <Route path="tags" element={<AdminTagsPage />} />
                 <Route path="content" element={<AdminContentPage />} />
+                <Route path="translations" element={<AdminTranslationsPage />} />
                 <Route path="settings" element={<AdminSettingsPage />} />
               </Route>
 

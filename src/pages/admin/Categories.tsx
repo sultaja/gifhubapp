@@ -1,8 +1,9 @@
+import * as React from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { getCategories, createCategory, updateCategory, deleteCategory } from "@/services/api";
+import { getCategories, createCategory, updateCategory, deleteCategory, deleteCategories } from "@/services/api";
 import { Category } from "@/types";
 import { DataTable } from "@/components/admin/DataTable";
-import { ColumnDef } from "@tanstack/react-table";
+import { ColumnDef, RowSelectionState, SortingState, useReactTable, getCoreRowModel, getPaginationRowModel, getSortedRowModel } from "@tanstack/react-table";
 import { Button } from "@/components/ui/button";
 import { ArrowUpDown, MoreHorizontal, PlusCircle, Edit, Trash2, Languages } from "lucide-react";
 import {
@@ -31,6 +32,8 @@ import { TranslationDialog } from "@/components/admin/TranslationDialog";
 
 const AdminCategoriesPage = () => {
   const queryClient = useQueryClient();
+  const [sorting, setSorting] = React.useState<SortingState>([]);
+  const [rowSelection, setRowSelection] = React.useState<RowSelectionState>({});
 
   const { data: categories, isLoading } = useQuery({
     queryKey: ["adminCategories"],
@@ -41,6 +44,7 @@ const AdminCategoriesPage = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["adminCategories"] });
       queryClient.invalidateQueries({ queryKey: ["hierarchicalCategories"] });
+      setRowSelection({});
     },
     onError: (error: Error) => {
       showError(error.message);
@@ -50,8 +54,8 @@ const AdminCategoriesPage = () => {
   const createMutation = useMutation({
     mutationFn: (newCategory: Omit<Category, 'id'>) => createCategory(newCategory),
     ...mutationOptions,
-    onSuccess: () => {
-      mutationOptions.onSuccess();
+    onSuccess: (...args) => {
+      mutationOptions.onSuccess(...args);
       showSuccess("Category created successfully!");
     }
   });
@@ -59,8 +63,8 @@ const AdminCategoriesPage = () => {
   const updateMutation = useMutation({
     mutationFn: ({ id, values }: { id: string, values: CategoryFormValues }) => updateCategory(id, values),
     ...mutationOptions,
-    onSuccess: () => {
-      mutationOptions.onSuccess();
+    onSuccess: (...args) => {
+      mutationOptions.onSuccess(...args);
       showSuccess("Category updated successfully!");
     }
   });
@@ -68,9 +72,18 @@ const AdminCategoriesPage = () => {
   const deleteMutation = useMutation({
     mutationFn: (id: string) => deleteCategory(id),
     ...mutationOptions,
-    onSuccess: () => {
-      mutationOptions.onSuccess();
+    onSuccess: (...args) => {
+      mutationOptions.onSuccess(...args);
       showSuccess("Category deleted successfully!");
+    }
+  });
+
+  const deleteManyMutation = useMutation({
+    mutationFn: (ids: string[]) => deleteCategories(ids),
+    ...mutationOptions,
+    onSuccess: (...args) => {
+      mutationOptions.onSuccess(...args);
+      showSuccess("Selected categories deleted successfully!");
     }
   });
 
@@ -196,25 +209,65 @@ const AdminCategoriesPage = () => {
     },
   ];
 
-  const tableData = isLoading ? [] : categories || [];
+  const table = useReactTable({
+    data: categories || [],
+    columns,
+    onSortingChange: setSorting,
+    onRowSelectionChange: setRowSelection,
+    getCoreRowModel: getCoreRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+    state: {
+      sorting,
+      rowSelection,
+    },
+  });
+
+  const selectedIds = table.getSelectedRowModel().rows.map(row => row.original.id);
 
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-3xl font-bold">Manage Categories</h1>
-        <CategoryDialog onSave={handleSave} isSaving={createMutation.isPending}>
-          <Button>
-            <PlusCircle className="mr-2 h-4 w-4" />
-            Add New Category
-          </Button>
-        </CategoryDialog>
+        <div className="flex items-center space-x-2">
+          {selectedIds.length > 0 && (
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button variant="destructive">
+                  <Trash2 className="mr-2 h-4 w-4" />
+                  Delete ({selectedIds.length})
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    This action cannot be undone. This will permanently delete {selectedIds.length} category(s).
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogAction onClick={() => deleteManyMutation.mutate(selectedIds)}>
+                    Continue
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          )}
+          <CategoryDialog onSave={handleSave} isSaving={createMutation.isPending}>
+            <Button>
+              <PlusCircle className="mr-2 h-4 w-4" />
+              Add New Category
+            </Button>
+          </CategoryDialog>
+        </div>
       </div>
       {isLoading && (
         <div className="rounded-md border p-4">
           <div className="w-full text-center p-4">Loading Categories...</div>
         </div>
       )}
-      {!isLoading && <DataTable columns={columns} data={tableData} />}
+      {!isLoading && <DataTable columns={columns} data={categories || []} />}
     </div>
   );
 };

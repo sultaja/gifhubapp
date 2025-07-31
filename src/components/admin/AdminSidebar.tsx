@@ -1,6 +1,6 @@
 import { Link, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
-import { LayoutDashboard, GitFork, Tag, Settings, Home, FolderKanban, FileText } from "lucide-react";
+import { LayoutDashboard, GitFork, Tag, Settings, Home, FolderKanban, FileText, Languages } from "lucide-react";
 
 const navItems = [
   { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
@@ -8,6 +8,7 @@ const navItems = [
   { href: "/admin/categories", label: "Categories", icon: FolderKanban },
   { href: "/admin/tags", label: "Tags", icon: Tag },
   { href: "/admin/content", label: "Content", icon: FileText },
+  { href: "/admin/translations", label: "Translations", icon: Languages },
   { href: "/admin/settings", label: "Settings", icon: Settings },
 ];
 

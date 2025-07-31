@@ -1,5 +1,5 @@
 import { supabase } from "@/integrations/supabase/client";
-import { Gif, Category, Tag, SiteSettings, CategoryTranslation, TagTranslation, GifTranslation, ContentSection, HierarchicalCategory } from "@/types";
+import { Gif, Category, Tag, SiteSettings, CategoryTranslation, TagTranslation, GifTranslation, ContentSection, HierarchicalCategory, UiTranslation } from "@/types";
 import { GifFormValues } from "@/components/admin/GifDialog";
 
 // The base query for fetching GIFs with their related category and tags, now including translations
@@ -67,6 +67,11 @@ export const deleteCategory = async (id: string) => {
     if (error) throw new Error(error.message);
 };
 
+export const deleteCategories = async (ids: string[]) => {
+    const { error } = await supabase.from('categories').delete().in('id', ids);
+    if (error) throw new Error(error.message);
+};
+
 
 // --- TAG API ---
 export const getTags = async (): Promise<Tag[]> => {
@@ -89,6 +94,11 @@ export const updateTag = async (id: string, updates: Partial<Tag>): Promise<Tag>
 
 export const deleteTag = async (id: string) => {
     const { error } = await supabase.from('tags').delete().eq('id', id);
+    if (error) throw new Error(error.message);
+};
+
+export const deleteTags = async (ids: string[]) => {
+    const { error } = await supabase.from('tags').delete().in('id', ids);
     if (error) throw new Error(error.message);
 };
 
@@ -173,6 +183,14 @@ export const deleteGif = async (id: string) => {
 
   const { error: gifError } = await supabase.from("gifs").delete().eq("id", id);
   if (gifError) throw new Error(`Failed to delete GIF: ${gifError.message}`);
+};
+
+export const deleteGifs = async (ids: string[]) => {
+    const { error: tagsError } = await supabase.from("gif_tags").delete().in("gif_id", ids);
+    if (tagsError) throw new Error(`Failed to delete GIF tag associations: ${tagsError.message}`);
+
+    const { error: gifError } = await supabase.from("gifs").delete().in("id", ids);
+    if (gifError) throw new Error(`Failed to delete GIFs: ${gifError.message}`);
 };
 
 export const getLatestGifs = async (limit = 12): Promise<Gif[]> => {
@@ -348,6 +366,23 @@ export const upsertContentSection = async (section: Partial<ContentSection>): Pr
     const { data, error } = await supabase
         .from('content_sections')
         .upsert(section, { onConflict: 'section_key, language_code' })
+        .select()
+        .single();
+    if (error) throw new Error(error.message);
+    return data;
+};
+
+// --- UI TRANSLATIONS API ---
+export const getUiTranslations = async (): Promise<UiTranslation[]> => {
+    const { data, error } = await supabase.from('ui_translations').select('*');
+    if (error) throw new Error(error.message);
+    return data || [];
+};
+
+export const upsertUiTranslation = async (lang_code: string, translations: object): Promise<UiTranslation> => {
+    const { data, error } = await supabase
+        .from('ui_translations')
+        .upsert({ lang_code, translations })
         .select()
         .single();
     if (error) throw new Error(error.message);

@@ -1,8 +1,9 @@
+import * as React from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { getTags, createTag, updateTag, deleteTag } from "@/services/api";
+import { getTags, createTag, updateTag, deleteTag, deleteTags } from "@/services/api";
 import { Tag } from "@/types";
 import { DataTable } from "@/components/admin/DataTable";
-import { ColumnDef } from "@tanstack/react-table";
+import { ColumnDef, RowSelectionState, SortingState, useReactTable, getCoreRowModel, getPaginationRowModel, getSortedRowModel } from "@tanstack/react-table";
 import { Button } from "@/components/ui/button";
 import { ArrowUpDown, MoreHorizontal, PlusCircle, Edit, Trash2, Languages } from "lucide-react";
 import {
@@ -31,6 +32,8 @@ import { TranslationDialog } from "@/components/admin/TranslationDialog";
 
 const AdminTagsPage = () => {
   const queryClient = useQueryClient();
+  const [sorting, setSorting] = React.useState<SortingState>([]);
+  const [rowSelection, setRowSelection] = React.useState<RowSelectionState>({});
 
   const { data: tags, isLoading } = useQuery({
     queryKey: ["adminTags"],
@@ -40,6 +43,7 @@ const AdminTagsPage = () => {
   const mutationOptions = {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["adminTags"] });
+      setRowSelection({});
     },
     onError: (error: Error) => {
       showError(error.message);
@@ -49,8 +53,8 @@ const AdminTagsPage = () => {
   const createMutation = useMutation({
     mutationFn: (newTag: Omit<Tag, 'id' | 'tag_translations'> & { tag_translations: [] }) => createTag(newTag),
     ...mutationOptions,
-    onSuccess: () => {
-      mutationOptions.onSuccess();
+    onSuccess: (...args) => {
+      mutationOptions.onSuccess(...args);
       showSuccess("Tag created successfully!");
     }
   });
@@ -58,8 +62,8 @@ const AdminTagsPage = () => {
   const updateMutation = useMutation({
     mutationFn: ({ id, values }: { id: string, values: TagFormValues }) => updateTag(id, values),
     ...mutationOptions,
-    onSuccess: () => {
-      mutationOptions.onSuccess();
+    onSuccess: (...args) => {
+      mutationOptions.onSuccess(...args);
       showSuccess("Tag updated successfully!");
     }
   });
@@ -67,9 +71,18 @@ const AdminTagsPage = () => {
   const deleteMutation = useMutation({
     mutationFn: (id: string) => deleteTag(id),
     ...mutationOptions,
-    onSuccess: () => {
-      mutationOptions.onSuccess();
+    onSuccess: (...args) => {
+      mutationOptions.onSuccess(...args);
       showSuccess("Tag deleted successfully!");
+    }
+  });
+
+  const deleteManyMutation = useMutation({
+    mutationFn: (ids: string[]) => deleteTags(ids),
+    ...mutationOptions,
+    onSuccess: (...args) => {
+      mutationOptions.onSuccess(...args);
+      showSuccess("Selected tags deleted successfully!");
     }
   });
 
@@ -77,7 +90,6 @@ const AdminTagsPage = () => {
     if (tagId) {
       updateMutation.mutate({ id: tagId, values });
     } else {
-      // Add the required 'tag_translations' property when creating a new tag
       createMutation.mutate({ ...values, tag_translations: [] });
     }
   };
@@ -182,25 +194,65 @@ const AdminTagsPage = () => {
     },
   ];
 
-  const tableData = isLoading ? [] : tags || [];
+  const table = useReactTable({
+    data: tags || [],
+    columns,
+    onSortingChange: setSorting,
+    onRowSelectionChange: setRowSelection,
+    getCoreRowModel: getCoreRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+    state: {
+      sorting,
+      rowSelection,
+    },
+  });
+
+  const selectedIds = table.getSelectedRowModel().rows.map(row => row.original.id);
 
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-3xl font-bold">Manage Tags</h1>
-        <TagDialog onSave={handleSave} isSaving={createMutation.isPending}>
-          <Button>
-            <PlusCircle className="mr-2 h-4 w-4" />
-            Add New Tag
-          </Button>
-        </TagDialog>
+        <div className="flex items-center space-x-2">
+          {selectedIds.length > 0 && (
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button variant="destructive">
+                  <Trash2 className="mr-2 h-4 w-4" />
+                  Delete ({selectedIds.length})
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    This action cannot be undone. This will permanently delete {selectedIds.length} tag(s).
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogAction onClick={() => deleteManyMutation.mutate(selectedIds)}>
+                    Continue
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          )}
+          <TagDialog onSave={handleSave} isSaving={createMutation.isPending}>
+            <Button>
+              <PlusCircle className="mr-2 h-4 w-4" />
+              Add New Tag
+            </Button>
+          </TagDialog>
+        </div>
       </div>
       {isLoading && (
         <div className="rounded-md border p-4">
           <div className="w-full text-center p-4">Loading Tags...</div>
         </div>
       )}
-      {!isLoading && <DataTable columns={columns} data={tableData} />}
+      {!isLoading && <DataTable columns={columns} data={tags || []} />}
     </div>
   );
 };
