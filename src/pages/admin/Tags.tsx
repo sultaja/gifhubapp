@@ -92,7 +92,11 @@ const AdminTagsPage = () => {
     if (tagId) {
       updateMutation.mutate({ id: tagId, values });
     } else {
-      createMutation.mutate({ ...values, tag_translations: [] });
+      createMutation.mutate({
+        name: values.name,
+        slug: values.slug,
+        tag_translations: [],
+      });
     }
   };
 

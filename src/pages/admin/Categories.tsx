@@ -90,19 +90,16 @@ const AdminCategoriesPage = () => {
   });
 
   const handleSave = (values: CategoryFormValues, categoryId?: string) => {
-    const categoryData = {
-      ...values,
-      parent_id: values.parent_id || null,
-    };
-
     if (categoryId) {
-      updateMutation.mutate({ id: categoryId, values: categoryData });
+      updateMutation.mutate({ id: categoryId, values });
     } else {
-      const newCategory: Omit<Category, 'id'> = {
-        ...categoryData,
+      createMutation.mutate({
+        name: values.name,
+        slug: values.slug,
+        icon: values.icon,
+        parent_id: values.parent_id || null,
         category_translations: [],
-      };
-      createMutation.mutate(newCategory);
+      });
     }
   };
 
