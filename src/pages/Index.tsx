@@ -7,14 +7,7 @@ import GifCard from "@/components/GifCard";
 import { useQuery } from "@tanstack/react-query";
 import { getHierarchicalCategories, getLatestGifs, getFeaturedGifs } from "@/services/api";
 import { Skeleton } from "@/components/ui/skeleton";
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
 import DynamicIcon from "@/components/DynamicIcon";
-import { Badge } from "@/components/ui/badge";
 import { useTranslation } from "react-i18next";
 import { getTranslatedName } from "@/lib/translations";
 
@@ -89,39 +82,47 @@ const Index = () => {
 
       {/* Trending Categories */}
       <section className="py-12">
-        <h2 className="text-2xl font-bold mb-6 text-center">{t('home.browse_by_category')}</h2>
+        <h2 className="text-2xl font-bold mb-8 text-center">{t('home.browse_by_category')}</h2>
         {isLoadingCategories ? (
-          <div className="max-w-4xl mx-auto space-y-2">
-            {Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-14 w-full" />)}
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-7 gap-x-6 gap-y-8">
+            {Array.from({ length: 14 }).map((_, i) => (
+              <div key={i} className="space-y-3">
+                <Skeleton className="h-6 w-3/4" />
+                <div className="space-y-2">
+                  <Skeleton className="h-5 w-full" />
+                  <Skeleton className="h-5 w-5/6" />
+                </div>
+              </div>
+            ))}
           </div>
         ) : (
-          <Accordion type="multiple" className="w-full max-w-4xl mx-auto">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-7 gap-x-6 gap-y-8">
             {categories?.map((category) => (
-              <AccordionItem value={category.id} key={category.id}>
-                <AccordionTrigger className="text-lg font-semibold hover:no-underline">
-                  <div className="flex items-center gap-3">
-                    <DynamicIcon name={category.icon || 'Folder'} className="h-6 w-6 text-primary" />
+              <div key={category.id}>
+                <Link to={`/category/${category.slug}`} className="flex items-center gap-2 mb-3 group">
+                  <DynamicIcon name={category.icon || 'Folder'} className="h-5 w-5 text-primary transition-transform group-hover:scale-110" />
+                  <h3 className="font-bold text-md group-hover:text-primary transition-colors">
                     {getTranslatedName(category, i18n.language, 'category_translations')}
-                  </div>
-                </AccordionTrigger>
-                <AccordionContent>
-                  <div className="p-4 flex flex-wrap gap-2">
-                    {category.sub_categories.length > 0 ? (
-                      category.sub_categories.map((sub) => (
-                        <Link key={sub.id} to={`/category/${sub.slug}`}>
-                          <Badge variant="outline" className="text-md py-1 px-3 hover:bg-accent">
-                            {getTranslatedName(sub, i18n.language, 'category_translations')}
-                          </Badge>
-                        </Link>
-                      ))
-                    ) : (
-                      <p className="text-muted-foreground text-sm">{t('home.no_subcategories')}</p>
-                    )}
-                  </div>
-                </AccordionContent>
-              </AccordionItem>
+                  </h3>
+                </Link>
+                <div className="flex flex-col items-start space-y-2 pl-7">
+                  {category.sub_categories.length > 0 ? (
+                    category.sub_categories.map((sub) => (
+                      <Link
+                        key={sub.id}
+                        to={`/category/${sub.slug}`}
+                        className="text-sm text-muted-foreground hover:text-primary hover:underline underline-offset-4"
+                      >
+                        {getTranslatedName(sub, i18n.language, 'category_translations')}
+                      </Link>
+                    ))
+                  ) : (
+                    <p className="text-sm text-muted-foreground italic">{t('home.no_subcategories')}</p>
+                  )}
+                </div>
+              </div>
             ))}
-          </Accordion>
+          </div>
         )}
       </section>
 
