@@ -24,14 +24,32 @@ i18n
     react: {
       useSuspense: false,
     },
-    // Load default translations immediately
     resources,
   });
 
-// Fetch translations from the database and merge them
+const recursivelyClean = (obj: any): boolean => {
+  let wasModified = false;
+  for (const key in obj) {
+    if (typeof obj[key] === 'string') {
+      const original = obj[key];
+      // This regex finds {{...}} patterns that are immediately enclosed in double quotes
+      // and removes the quotes, fixing the interpolation.
+      const cleaned = original.replace(/"(\{\{.*?\}\})"/g, '$1');
+      if (original !== cleaned) {
+        obj[key] = cleaned;
+        wasModified = true;
+      }
+    } else if (typeof obj[key] === 'object' && obj[key] !== null) {
+      if (recursivelyClean(obj[key])) {
+        wasModified = true;
+      }
+    }
+  }
+  return wasModified;
+};
+
 getUiTranslations().then(async (dbTranslations) => {
   if (dbTranslations) {
-    // If no translations exist in the DB, seed it with the default set.
     if (dbTranslations.length === 0) {
       console.log("No UI translations found in DB, seeding with defaults...");
       const seedingPromises = Object.entries(defaultTranslations).map(([lang, content]) => {
@@ -44,12 +62,21 @@ getUiTranslations().then(async (dbTranslations) => {
         console.error("Error seeding translations:", error);
       }
     } else {
-      // Merge DB translations over the defaults
+      const updatePromises: Promise<any>[] = [];
       dbTranslations.forEach(t => {
-        i18n.addResourceBundle(t.lang_code, 'translation', t.translations, true, true);
+        const translationsObject = t.translations;
+        const wasModified = recursivelyClean(translationsObject);
+        if (wasModified) {
+          console.log(`Auto-fixing incorrect translation formatting for ${t.lang_code}.`);
+          updatePromises.push(upsertUiTranslation(t.lang_code, translationsObject));
+        }
+        i18n.addResourceBundle(t.lang_code, 'translation', translationsObject, true, true);
       });
+      
+      if (updatePromises.length > 0) {
+        await Promise.all(updatePromises);
+      }
     }
-    // This ensures the app re-renders with the latest translations
     i18n.changeLanguage(i18n.language);
   }
 });
