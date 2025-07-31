@@ -68,6 +68,30 @@ export const defaultTranslations = {
       subtitle: "Oops! Page not found",
       go_home: "Return to Home",
     },
+    category_page: {
+      title: "{{categoryName}} GIFs",
+      meta_not_found: "Category Not Found",
+      heading: "Category: {{categoryName}}",
+      description: 'Browsing all GIFs in the "{{categoryName}}" category.',
+      no_gifs: "No GIFs found in this category yet."
+    },
+    tag_page: {
+      title: "GIFs tagged #{{tagName}}",
+      meta_not_found: "Tag Not Found",
+      heading: "Tag: #{{tagName}}",
+      description: 'Browsing all GIFs tagged with "{{tagName}}".',
+      no_gifs: "No GIFs found with this tag yet."
+    },
+    content_page: {
+      unconfigured: "Content for this page has not been configured yet. Please add it in the admin panel."
+    },
+    pages: {
+      about: "About Us",
+      contact: "Contact Us",
+      advertise: "Advertise With Us",
+      privacy: "Privacy Policy",
+      terms: "Terms of Service"
+    },
     admin: {
       sidebar: {
         panel_title: "Admin Panel",
@@ -125,6 +149,8 @@ export const defaultTranslations = {
         title: "Manage Tags",
         add_new: "Add New Tag",
         loading: "Loading Tags...",
+        col_name: "Name (Default)",
+        col_slug: "Slug",
         delete_single_confirm: "This action cannot be undone. This will permanently delete the tag and may affect existing GIFs.",
         delete_many_confirm: "This action cannot be undone. This will permanently delete {count} tag(s).",
         toast_create_success: "Tag created successfully!",
@@ -306,6 +332,30 @@ export const defaultTranslations = {
       subtitle: "Oops! Sayfa bulunamadı",
       go_home: "Ana Sayfaya Dön",
     },
+    category_page: {
+      title: "{{categoryName}} GIF'leri",
+      meta_not_found: "Kategori Bulunamadı",
+      heading: "Kategori: {{categoryName}}",
+      description: '"{{categoryName}}" kategorisindeki tüm GIF\'lere göz atılıyor.',
+      no_gifs: "Bu kategoride henüz GIF bulunamadı."
+    },
+    tag_page: {
+      title: "#{{tagName}} etiketli GIF'ler",
+      meta_not_found: "Etiket Bulunamadı",
+      heading: "Etiket: #{{tagName}}",
+      description: '"{{tagName}}" ile etiketlenmiş tüm GIF\'lere göz atılıyor.',
+      no_gifs: "Bu etiketle henüz GIF bulunamadı."
+    },
+    content_page: {
+      unconfigured: "Bu sayfa için içerik henüz yapılandırılmadı. Lütfen yönetici panelinden ekleyin."
+    },
+    pages: {
+      about: "Hakkımızda",
+      contact: "İletişim",
+      advertise: "Reklam Verin",
+      privacy: "Gizlilik Politikası",
+      terms: "Hizmet Şartları"
+    },
     admin: {
       sidebar: {
         panel_title: "Yönetim Paneli",
@@ -363,6 +413,8 @@ export const defaultTranslations = {
         title: "Etiketleri Yönet",
         add_new: "Yeni Etiket Ekle",
         loading: "Etiketler Yükleniyor...",
+        col_name: "Ad (Varsayılan)",
+        col_slug: "Slug",
         delete_single_confirm: "Bu işlem geri alınamaz. Bu, etiketi kalıcı olarak silecek ve mevcut GIF'leri etkileyebilir.",
         delete_many_confirm: "Bu işlem geri alınamaz. {count} etiket kalıcı olarak silinecektir.",
         toast_create_success: "Etiket başarıyla oluşturuldu!",
@@ -544,6 +596,30 @@ export const defaultTranslations = {
       subtitle: "Ой! Страница не найдена",
       go_home: "Вернуться на главную",
     },
+    category_page: {
+      title: "GIF-файлы {{categoryName}}",
+      meta_not_found: "Категория не найдена",
+      heading: "Категория: {{categoryName}}",
+      description: 'Просмотр всех GIF-файлов в категории "{{categoryName}}".',
+      no_gifs: "В этой категории пока нет GIF-файлов."
+    },
+    tag_page: {
+      title: "GIF-файлы с тегом #{{tagName}}",
+      meta_not_found: "Тег не найден",
+      heading: "Тег: #{{tagName}}",
+      description: 'Просмотр всех GIF-файлов с тегом "{{tagName}}".',
+      no_gifs: "Пока нет GIF-файлов с этим тегом."
+    },
+    content_page: {
+      unconfigured: "Содержимое для этой страницы еще не настроено. Пожалуйста, добавьте его в панели администратора."
+    },
+    pages: {
+      about: "О нас",
+      contact: "Контакты",
+      advertise: "Реклама",
+      privacy: "Политика конфиденциальности",
+      terms: "Условия использования"
+    },
     admin: {
       sidebar: {
         panel_title: "Панель администратора",
@@ -601,6 +677,8 @@ export const defaultTranslations = {
         title: "Управление тегами",
         add_new: "Добавить новый тег",
         loading: "Загрузка тегов...",
+        col_name: "Название (по умолч.)",
+        col_slug: "Slug",
         delete_single_confirm: "Это действие необратимо. Тег будет удален навсегда и это может повлиять на существующие GIF.",
         delete_many_confirm: "Это действие необратимо. {count} тег(ов) будет(ут) удален(ы) навсегда.",
         toast_create_success: "Тег успешно создан!",
@@ -782,6 +860,30 @@ export const defaultTranslations = {
       subtitle: "Uups! Səhifə tapılmadı",
       go_home: "Ana Səhifəyə Qayıt",
     },
+    category_page: {
+      title: "{{categoryName}} GIF'ləri",
+      meta_not_found: "Kateqoriya Tapılmadı",
+      heading: "Kateqoriya: {{categoryName}}",
+      description: '"{{categoryName}}" kateqoriyasındakı bütün GIF\'lərə baxılır.',
+      no_gifs: "Bu kateqoriyada hələ GIF tapılmadı."
+    },
+    tag_page: {
+      title: "#{{tagName}} etiketli GIF'lər",
+      meta_not_found: "Etiket Tapılmadı",
+      heading: "Etiket: #{{tagName}}",
+      description: '"{{tagName}}" ilə etiketlənmiş bütün GIF\'lərə baxılır.',
+      no_gifs: "Bu etiketlə hələ GIF tapılmadı."
+    },
+    content_page: {
+      unconfigured: "Bu səhifə üçün məzmun hələ konfiqurasiya edilməyib. Zəhmət olmasa admin panelində əlavə edin."
+    },
+    pages: {
+      about: "Haqqımızda",
+      contact: "Əlaqə",
+      advertise: "Reklam",
+      privacy: "Məxfilik Siyasəti",
+      terms: "İstifadə Şərtləri"
+    },
     admin: {
       sidebar: {
         panel_title: "İdarəetmə Paneli",
@@ -839,6 +941,8 @@ export const defaultTranslations = {
         title: "Etiketləri İdarə Et",
         add_new: "Yeni Etiket Əlavə Et",
         loading: "Etiketlər Yüklənir...",
+        col_name: "Ad (Standart)",
+        col_slug: "Slug",
         delete_single_confirm: "Bu əməliyyat geri qaytarıla bilməz. Bu, etiketi qalıcı olaraq siləcək və mövcud GIF'lərə təsir edə bilər.",
         delete_many_confirm: "Bu əməliyyat geri qaytarıla bilməz. {count} etiket qalıcı olaraq silinəcək.",
         toast_create_success: "Etiket uğurla yaradıldı!",

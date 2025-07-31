@@ -29,9 +29,11 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { showSuccess, showError } from "@/utils/toast";
 import { CategoryDialog, CategoryFormValues } from "@/components/admin/CategoryDialog";
 import { TranslationDialog } from "@/components/admin/TranslationDialog";
+import { useTranslation } from "react-i18next";
 
 const AdminCategoriesPage = () => {
   const queryClient = useQueryClient();
+  const { t } = useTranslation();
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [rowSelection, setRowSelection] = React.useState<RowSelectionState>({});
 
@@ -56,7 +58,7 @@ const AdminCategoriesPage = () => {
     ...mutationOptions,
     onSuccess: (...args) => {
       mutationOptions.onSuccess(...args);
-      showSuccess("Category created successfully!");
+      showSuccess(t('admin.categories.toast_create_success'));
     }
   });
 
@@ -65,7 +67,7 @@ const AdminCategoriesPage = () => {
     ...mutationOptions,
     onSuccess: (...args) => {
       mutationOptions.onSuccess(...args);
-      showSuccess("Category updated successfully!");
+      showSuccess(t('admin.categories.toast_update_success'));
     }
   });
 
@@ -74,7 +76,7 @@ const AdminCategoriesPage = () => {
     ...mutationOptions,
     onSuccess: (...args) => {
       mutationOptions.onSuccess(...args);
-      showSuccess("Category deleted successfully!");
+      showSuccess(t('admin.categories.toast_delete_success'));
     }
   });
 
@@ -83,7 +85,7 @@ const AdminCategoriesPage = () => {
     ...mutationOptions,
     onSuccess: (...args) => {
       mutationOptions.onSuccess(...args);
-      showSuccess("Selected categories deleted successfully!");
+      showSuccess(t('admin.categories.toast_delete_many_success'));
     }
   });
 
@@ -125,7 +127,7 @@ const AdminCategoriesPage = () => {
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
-          Name (Default)
+          {t('admin.categories.col_name')}
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       ),
@@ -141,7 +143,7 @@ const AdminCategoriesPage = () => {
     },
     {
       accessorKey: "slug",
-      header: "Slug",
+      header: t('admin.categories.col_slug'),
     },
     {
       id: "actions",
@@ -157,7 +159,7 @@ const AdminCategoriesPage = () => {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
-                <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                <DropdownMenuLabel>{t('admin.dialog_shared.actions')}</DropdownMenuLabel>
                 <CategoryDialog
                   category={category}
                   onSave={handleSave}
@@ -165,13 +167,13 @@ const AdminCategoriesPage = () => {
                 >
                   <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
                     <Edit className="mr-2 h-4 w-4" />
-                    Edit
+                    {t('admin.dialog_shared.edit')}
                   </DropdownMenuItem>
                 </CategoryDialog>
                 <TranslationDialog item={category} type="category">
                    <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
                     <Languages className="mr-2 h-4 w-4" />
-                    Translate
+                    {t('admin.dialog_shared.translate')}
                   </DropdownMenuItem>
                 </TranslationDialog>
                 <DropdownMenuSeparator />
@@ -182,21 +184,20 @@ const AdminCategoriesPage = () => {
                       onSelect={(e) => e.preventDefault()}
                     >
                       <Trash2 className="mr-2 h-4 w-4" />
-                      Delete
+                      {t('admin.dialog_shared.delete')}
                     </DropdownMenuItem>
                   </AlertDialogTrigger>
                   <AlertDialogContent>
                     <AlertDialogHeader>
-                      <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                      <AlertDialogTitle>{t('admin.dialog_shared.are_you_sure')}</AlertDialogTitle>
                       <AlertDialogDescription>
-                        This action cannot be undone. This will permanently delete the
-                        category. If it has sub-categories, they will become top-level categories.
+                        {t('admin.categories.delete_single_confirm')}
                       </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
-                      <AlertDialogCancel>Cancel</AlertDialogCancel>
+                      <AlertDialogCancel>{t('admin.dialog_shared.cancel')}</AlertDialogCancel>
                       <AlertDialogAction onClick={() => deleteMutation.mutate(category.id)}>
-                        Continue
+                        {t('admin.dialog_shared.continue')}
                       </AlertDialogAction>
                     </AlertDialogFooter>
                   </AlertDialogContent>
@@ -228,27 +229,27 @@ const AdminCategoriesPage = () => {
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-3xl font-bold">Manage Categories</h1>
+        <h1 className="text-3xl font-bold">{t('admin.categories.title')}</h1>
         <div className="flex items-center space-x-2">
           {selectedIds.length > 0 && (
             <AlertDialog>
               <AlertDialogTrigger asChild>
                 <Button variant="destructive">
                   <Trash2 className="mr-2 h-4 w-4" />
-                  Delete ({selectedIds.length})
+                  {t('admin.dialog_shared.delete')} ({selectedIds.length})
                 </Button>
               </AlertDialogTrigger>
               <AlertDialogContent>
                 <AlertDialogHeader>
-                  <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                  <AlertDialogTitle>{t('admin.dialog_shared.are_you_sure')}</AlertDialogTitle>
                   <AlertDialogDescription>
-                    This action cannot be undone. This will permanently delete {selectedIds.length} category(s).
+                    {t('admin.categories.delete_many_confirm', { count: selectedIds.length })}
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
-                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogCancel>{t('admin.dialog_shared.cancel')}</AlertDialogCancel>
                   <AlertDialogAction onClick={() => deleteManyMutation.mutate(selectedIds)}>
-                    Continue
+                    {t('admin.dialog_shared.continue')}
                   </AlertDialogAction>
                 </AlertDialogFooter>
               </AlertDialogContent>
@@ -257,14 +258,14 @@ const AdminCategoriesPage = () => {
           <CategoryDialog onSave={handleSave} isSaving={createMutation.isPending}>
             <Button>
               <PlusCircle className="mr-2 h-4 w-4" />
-              Add New Category
+              {t('admin.categories.add_new')}
             </Button>
           </CategoryDialog>
         </div>
       </div>
       {isLoading && (
         <div className="rounded-md border p-4">
-          <div className="w-full text-center p-4">Loading Categories...</div>
+          <div className="w-full text-center p-4">{t('admin.categories.loading')}</div>
         </div>
       )}
       {!isLoading && <DataTable table={table} columns={columns} />}

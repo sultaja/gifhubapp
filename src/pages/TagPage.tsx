@@ -10,7 +10,7 @@ import { getTranslatedName } from "@/lib/translations";
 
 const TagPage = () => {
   const { slug } = useParams<{ slug: string }>();
-  const { i18n } = useTranslation();
+  const { t, i18n } = useTranslation();
 
   const { data, isLoading, isError } = useQuery({
     queryKey: ["tag", slug],
@@ -24,11 +24,11 @@ const TagPage = () => {
 
   useEffect(() => {
     if (tag) {
-      document.title = `GIFs tagged #${tagName} - GifHub.App`;
+      document.title = `${t('tag_page.title', { tagName })} - GifHub.App`;
     } else if (isError) {
-      document.title = "Tag Not Found - GifHub.App";
+      document.title = `${t('tag_page.meta_not_found')} - GifHub.App`;
     }
-  }, [tag, tagName, isError]);
+  }, [tag, tagName, isError, t]);
 
   if (isLoading) {
     return (
@@ -53,9 +53,9 @@ const TagPage = () => {
   return (
     <div className="container mx-auto px-4 py-8">
       <section className="py-12 text-center">
-        <h1 className="text-4xl font-bold mb-2">Tag: #{tagName}</h1>
+        <h1 className="text-4xl font-bold mb-2">{t('tag_page.heading', { tagName })}</h1>
         <p className="text-muted-foreground">
-          Browsing all GIFs tagged with "{tagName}".
+          {t('tag_page.description', { tagName })}
         </p>
       </section>
 
@@ -69,7 +69,7 @@ const TagPage = () => {
         ) : (
           <div className="text-center py-16">
             <p className="text-lg text-muted-foreground">
-              No GIFs found with this tag yet.
+              {t('tag_page.no_gifs')}
             </p>
           </div>
         )}

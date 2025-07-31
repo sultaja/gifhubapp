@@ -10,7 +10,7 @@ import { getTranslatedName } from "@/lib/translations";
 
 const CategoryPage = () => {
   const { slug } = useParams<{ slug: string }>();
-  const { i18n } = useTranslation();
+  const { t, i18n } = useTranslation();
 
   const { data, isLoading, isError } = useQuery({
     queryKey: ["category", slug],
@@ -24,11 +24,11 @@ const CategoryPage = () => {
 
   useEffect(() => {
     if (category) {
-      document.title = `${categoryName} GIFs - GifHub.App`;
+      document.title = `${t('category_page.title', { categoryName })} - GifHub.App`;
     } else if (isError) {
-      document.title = "Category Not Found - GifHub.App";
+      document.title = `${t('category_page.meta_not_found')} - GifHub.App`;
     }
-  }, [category, categoryName, isError]);
+  }, [category, categoryName, isError, t]);
 
   if (isLoading) {
     return (
@@ -54,10 +54,10 @@ const CategoryPage = () => {
     <div className="container mx-auto px-4 py-8">
       <section className="py-12 text-center">
         <h1 className="text-4xl font-bold mb-2">
-          Category: {categoryName}
+          {t('category_page.heading', { categoryName })}
         </h1>
         <p className="text-muted-foreground">
-          Browsing all GIFs in the "{categoryName}" category.
+          {t('category_page.description', { categoryName })}
         </p>
       </section>
 
@@ -71,7 +71,7 @@ const CategoryPage = () => {
         ) : (
           <div className="text-center py-16">
             <p className="text-lg text-muted-foreground">
-              No GIFs found in this category yet.
+              {t('category_page.no_gifs')}
             </p>
           </div>
         )}

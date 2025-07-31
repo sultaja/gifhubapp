@@ -6,11 +6,13 @@ import { Skeleton } from '@/components/ui/skeleton';
 
 interface ContentPageProps {
   sectionKey: string;
-  defaultTitle: string;
+  defaultTitleKey: string;
 }
 
-const ContentPage = ({ sectionKey, defaultTitle }: ContentPageProps) => {
-  const { i18n } = useTranslation();
+const ContentPage = ({ sectionKey, defaultTitleKey }: ContentPageProps) => {
+  const { t, i18n } = useTranslation();
+  const defaultTitle = t(defaultTitleKey);
+
   const { data: content, isLoading } = useQuery({
     queryKey: ['contentSection', sectionKey, i18n.language],
     queryFn: () => getContentSection(sectionKey, i18n.language),
@@ -46,7 +48,7 @@ const ContentPage = ({ sectionKey, defaultTitle }: ContentPageProps) => {
     return (
       <div className="container max-w-4xl py-12">
         <h1 className="text-4xl font-bold mb-4">{defaultTitle}</h1>
-        <p>Content for this page has not been configured yet. Please add it in the admin panel.</p>
+        <p>{t('content_page.unconfigured')}</p>
       </div>
     );
   }

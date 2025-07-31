@@ -29,9 +29,11 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { showSuccess, showError } from "@/utils/toast";
 import { TagDialog, TagFormValues } from "@/components/admin/TagDialog";
 import { TranslationDialog } from "@/components/admin/TranslationDialog";
+import { useTranslation } from "react-i18next";
 
 const AdminTagsPage = () => {
   const queryClient = useQueryClient();
+  const { t } = useTranslation();
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [rowSelection, setRowSelection] = React.useState<RowSelectionState>({});
 
@@ -55,7 +57,7 @@ const AdminTagsPage = () => {
     ...mutationOptions,
     onSuccess: (...args) => {
       mutationOptions.onSuccess(...args);
-      showSuccess("Tag created successfully!");
+      showSuccess(t('admin.tags.toast_create_success'));
     }
   });
 
@@ -64,7 +66,7 @@ const AdminTagsPage = () => {
     ...mutationOptions,
     onSuccess: (...args) => {
       mutationOptions.onSuccess(...args);
-      showSuccess("Tag updated successfully!");
+      showSuccess(t('admin.tags.toast_update_success'));
     }
   });
 
@@ -73,7 +75,7 @@ const AdminTagsPage = () => {
     ...mutationOptions,
     onSuccess: (...args) => {
       mutationOptions.onSuccess(...args);
-      showSuccess("Tag deleted successfully!");
+      showSuccess(t('admin.tags.toast_delete_success'));
     }
   });
 
@@ -82,7 +84,7 @@ const AdminTagsPage = () => {
     ...mutationOptions,
     onSuccess: (...args) => {
       mutationOptions.onSuccess(...args);
-      showSuccess("Selected tags deleted successfully!");
+      showSuccess(t('admin.tags.toast_delete_many_success'));
     }
   });
 
@@ -119,14 +121,14 @@ const AdminTagsPage = () => {
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
-          Name (Default)
+          {t('admin.tags.col_name')}
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       ),
     },
     {
       accessorKey: "slug",
-      header: "Slug",
+      header: t('admin.tags.col_slug'),
     },
     {
       id: "actions",
@@ -142,7 +144,7 @@ const AdminTagsPage = () => {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
-                <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                <DropdownMenuLabel>{t('admin.dialog_shared.actions')}</DropdownMenuLabel>
                 <TagDialog
                   tag={tag}
                   onSave={handleSave}
@@ -150,13 +152,13 @@ const AdminTagsPage = () => {
                 >
                   <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
                     <Edit className="mr-2 h-4 w-4" />
-                    Edit
+                    {t('admin.dialog_shared.edit')}
                   </DropdownMenuItem>
                 </TagDialog>
                 <TranslationDialog item={tag} type="tag">
                    <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
                     <Languages className="mr-2 h-4 w-4" />
-                    Translate
+                    {t('admin.dialog_shared.translate')}
                   </DropdownMenuItem>
                 </TranslationDialog>
                 <DropdownMenuSeparator />
@@ -167,21 +169,20 @@ const AdminTagsPage = () => {
                       onSelect={(e) => e.preventDefault()}
                     >
                       <Trash2 className="mr-2 h-4 w-4" />
-                      Delete
+                      {t('admin.dialog_shared.delete')}
                     </DropdownMenuItem>
                   </AlertDialogTrigger>
                   <AlertDialogContent>
                     <AlertDialogHeader>
-                      <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                      <AlertDialogTitle>{t('admin.dialog_shared.are_you_sure')}</AlertDialogTitle>
                       <AlertDialogDescription>
-                        This action cannot be undone. This will permanently delete the
-                        tag and may affect existing GIFs.
+                        {t('admin.tags.delete_single_confirm')}
                       </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
-                      <AlertDialogCancel>Cancel</AlertDialogCancel>
+                      <AlertDialogCancel>{t('admin.dialog_shared.cancel')}</AlertDialogCancel>
                       <AlertDialogAction onClick={() => deleteMutation.mutate(tag.id)}>
-                        Continue
+                        {t('admin.dialog_shared.continue')}
                       </AlertDialogAction>
                     </AlertDialogFooter>
                   </AlertDialogContent>
@@ -213,27 +214,27 @@ const AdminTagsPage = () => {
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-3xl font-bold">Manage Tags</h1>
+        <h1 className="text-3xl font-bold">{t('admin.tags.title')}</h1>
         <div className="flex items-center space-x-2">
           {selectedIds.length > 0 && (
             <AlertDialog>
               <AlertDialogTrigger asChild>
                 <Button variant="destructive">
                   <Trash2 className="mr-2 h-4 w-4" />
-                  Delete ({selectedIds.length})
+                  {t('admin.dialog_shared.delete')} ({selectedIds.length})
                 </Button>
               </AlertDialogTrigger>
               <AlertDialogContent>
                 <AlertDialogHeader>
-                  <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                  <AlertDialogTitle>{t('admin.dialog_shared.are_you_sure')}</AlertDialogTitle>
                   <AlertDialogDescription>
-                    This action cannot be undone. This will permanently delete {selectedIds.length} tag(s).
+                    {t('admin.tags.delete_many_confirm', { count: selectedIds.length })}
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
-                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogCancel>{t('admin.dialog_shared.cancel')}</AlertDialogCancel>
                   <AlertDialogAction onClick={() => deleteManyMutation.mutate(selectedIds)}>
-                    Continue
+                    {t('admin.dialog_shared.continue')}
                   </AlertDialogAction>
                 </AlertDialogFooter>
               </AlertDialogContent>
@@ -242,14 +243,14 @@ const AdminTagsPage = () => {
           <TagDialog onSave={handleSave} isSaving={createMutation.isPending}>
             <Button>
               <PlusCircle className="mr-2 h-4 w-4" />
-              Add New Tag
+              {t('admin.tags.add_new')}
             </Button>
           </TagDialog>
         </div>
       </div>
       {isLoading && (
         <div className="rounded-md border p-4">
-          <div className="w-full text-center p-4">Loading Tags...</div>
+          <div className="w-full text-center p-4">{t('admin.tags.loading')}</div>
         </div>
       )}
       {!isLoading && <DataTable table={table} columns={columns} />}
