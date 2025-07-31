@@ -21,7 +21,7 @@ import { getTranslatedName } from "@/lib/translations";
 const Index = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const navigate = useNavigate();
-  const { i18n } = useTranslation();
+  const { t, i18n } = useTranslation();
 
   const { data: categories, isLoading: isLoadingCategories } = useQuery({
     queryKey: ["hierarchicalCategories"],
@@ -50,16 +50,16 @@ const Index = () => {
       {/* Hero Section */}
       <section className="text-center py-16">
         <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight mb-4">
-          The perfect GIF for your next big move.
+          {t('home.hero.title')}
         </h1>
         <p className="text-lg md:text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
-          A sleek, ultra-fast, and highly-curated platform for discovering and sharing GIFs for the professional world.
+          {t('home.hero.subtitle')}
         </p>
         <div className="max-w-xl mx-auto">
           <form onSubmit={handleSearchSubmit} className="flex w-full items-center space-x-2">
             <Input
               type="search"
-              placeholder="Search by title, tag, or category..."
+              placeholder={t('home.hero.search_placeholder')}
               className="flex-1"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
@@ -74,7 +74,7 @@ const Index = () => {
       {/* Featured GIFs */}
       {featuredGifs && featuredGifs.length > 0 && (
         <section className="py-12">
-          <h2 className="text-2xl font-bold mb-6 text-center">Featured GIFs</h2>
+          <h2 className="text-2xl font-bold mb-6 text-center">{t('home.featured_gifs')}</h2>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             {isLoadingFeaturedGifs ? (
               Array.from({ length: 8 }).map((_, i) => <Skeleton key={i} className="w-full h-auto aspect-square rounded-lg" />)
@@ -89,7 +89,7 @@ const Index = () => {
 
       {/* Trending Categories */}
       <section className="py-12">
-        <h2 className="text-2xl font-bold mb-6 text-center">Browse by Category</h2>
+        <h2 className="text-2xl font-bold mb-6 text-center">{t('home.browse_by_category')}</h2>
         {isLoadingCategories ? (
           <div className="max-w-4xl mx-auto space-y-2">
             {Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-14 w-full" />)}
@@ -115,7 +115,7 @@ const Index = () => {
                         </Link>
                       ))
                     ) : (
-                      <p className="text-muted-foreground text-sm">No sub-categories yet.</p>
+                      <p className="text-muted-foreground text-sm">{t('home.no_subcategories')}</p>
                     )}
                   </div>
                 </AccordionContent>
@@ -127,7 +127,7 @@ const Index = () => {
 
       {/* Latest GIFs */}
       <section className="py-12">
-        <h2 className="text-2xl font-bold mb-6 text-center">Latest GIFs</h2>
+        <h2 className="text-2xl font-bold mb-6 text-center">{t('home.latest_gifs')}</h2>
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
           {isLoadingLatestGifs ? (
             Array.from({ length: 12 }).map((_, i) => <Skeleton key={i} className="w-full h-auto aspect-square rounded-lg" />)

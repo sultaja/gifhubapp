@@ -25,6 +25,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { getCategories, getTags } from "@/services/api";
 import { showSuccess, showError, showLoading, dismissToast } from "@/utils/toast";
 import { Category, Tag } from "@/types";
+import { useTranslation } from "react-i18next";
 
 const formSchema = z.object({
   title: z.string().min(3, "Title must be at least 3 characters long."),
@@ -37,6 +38,7 @@ const SubmitGifPage = () => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const { t } = useTranslation();
 
   const { data: categories, isLoading: isLoadingCategories } = useQuery<Category[]>({
     queryKey: ["categories"],
@@ -59,7 +61,7 @@ const SubmitGifPage = () => {
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     setIsSubmitting(true);
-    const toastId = showLoading("Submitting your GIF...");
+    const toastId = showLoading(t('submit_page.toast.submitting'));
 
     const slug = values.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
 
@@ -76,7 +78,7 @@ const SubmitGifPage = () => {
 
     if (gifError || !gifData) {
       dismissToast(toastId);
-      showError(gifError?.message || "Failed to submit GIF. Please try again.");
+      showError(gifError?.message || t('submit_page.toast.submit_error'));
       setIsSubmitting(false);
       return;
     }
@@ -92,22 +94,22 @@ const SubmitGifPage = () => {
         // Attempt to clean up the created GIF if tag association fails
         await supabase.from("gifs").delete().eq("id", gifData.id);
         dismissToast(toastId);
-        showError(tagsError.message || "Failed to add tags to your GIF. Please try again.");
+        showError(tagsError.message || t('submit_page.toast.tags_error'));
         setIsSubmitting(false);
         return;
     }
 
     dismissToast(toastId);
-    showSuccess("GIF submitted successfully! It will be reviewed shortly.");
+    showSuccess(t('submit_page.toast.success'));
     queryClient.invalidateQueries({ queryKey: ['featuredGifs'] });
     navigate(`/gif/${gifData.slug}`);
   };
 
   return (
     <div className="container max-w-2xl py-12">
-      <h1 className="text-4xl font-bold mb-4">Submit a GIF</h1>
+      <h1 className="text-4xl font-bold mb-4">{t('submit_page.title')}</h1>
       <p className="text-muted-foreground mb-8">
-        Found a great GIF? Share it with the community! Fill out the form below.
+        {t('submit_page.subtitle')}
       </p>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
@@ -116,9 +118,9 @@ const SubmitGifPage = () => {
             name="title"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>GIF Title</FormLabel>
+                <FormLabel>{t('submit_page.form.title')}</FormLabel>
                 <FormControl>
-                  <Input placeholder="e.g., Michael Scott Celebrates" {...field} />
+                  <Input placeholder={t('submit_page.form.title_placeholder')} {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -129,7 +131,7 @@ const SubmitGifPage = () => {
             name="url"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>GIF URL</FormLabel>
+                <FormLabel>{t('submit_page.form.url')}</FormLabel>
                 <FormControl>
                   <Input placeholder="https://media.giphy.com/..." {...field} />
                 </FormControl>
@@ -142,16 +144,16 @@ const SubmitGifPage = () => {
             name="category_id"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Category</FormLabel>
+                <FormLabel>{t('submit_page.form.category')}</FormLabel>
                 <Select onValueChange={field.onChange} defaultValue={field.value}>
                   <FormControl>
                     <SelectTrigger>
-                      <SelectValue placeholder="Select a category" />
+                      <SelectValue placeholder={t('submit_page.form.category_placeholder')} />
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
                     {isLoadingCategories ? (
-                      <SelectItem value="loading" disabled>Loading...</SelectItem>
+                      <SelectItem value="loading" disabled>{t('submit_page.form.loading')}</SelectItem>
                     ) : (
                       categories?.map((cat) => (
                         <SelectItem key={cat.id} value={cat.id}>
@@ -170,9 +172,9 @@ const SubmitGifPage = () => {
             name="tags"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Tags</FormLabel>
+                <FormLabel>{t('submit_page.form.tags')}</FormLabel>
                  <FormControl>
-                    <p className="text-sm text-muted-foreground mb-2">Select all that apply. (Ctrl/Cmd + Click for multiple)</p>
+                    <p className="text-sm text-muted-foreground mb-2">{t('submit_page.form.tags_placeholder')}</p>
                  </FormControl>
                 <select
                     multiple
@@ -185,7 +187,7 @@ const SubmitGifPage = () => {
                     }}
                 >
                     {isLoadingTags ? (
-                        <option value="loading" disabled>Loading...</option>
+                        <option value="loading" disabled>{t('submit_page.form.loading')}</option>
                     ) : (
                         tags?.map((tag) => (
                             <option key={tag.id} value={tag.id}>
@@ -199,7 +201,7 @@ const SubmitGifPage = () => {
             )}
           />
           <Button type="submit" disabled={isSubmitting}>
-            {isSubmitting ? "Submitting..." : "Submit GIF"}
+            {isSubmitting ? t('submit_page.submitting') : t('submit_page.submit_button')}
           </Button>
         </form>
       </Form>

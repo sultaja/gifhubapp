@@ -14,7 +14,7 @@ import { getTranslatedTitle, getTranslatedName } from "@/lib/translations";
 
 const GifPage = () => {
   const { slug } = useParams<{ slug: string }>();
-  const { i18n } = useTranslation();
+  const { t, i18n } = useTranslation();
 
   const { data: gif, isLoading, isError } = useQuery({
     queryKey: ["gif", slug],
@@ -37,7 +37,7 @@ const GifPage = () => {
 
   const handleCopyLink = (link: string, type: string) => {
     navigator.clipboard.writeText(link);
-    showSuccess(`${type} link copied to clipboard!`);
+    showSuccess(`${type} ${t('gif_page.copy_success')}`);
   };
 
   const handleDownload = async () => {
@@ -54,10 +54,10 @@ const GifPage = () => {
       a.click();
       window.URL.revokeObjectURL(url);
       a.remove();
-      showSuccess("GIF download started!");
+      showSuccess(t('gif_page.download_success'));
     } catch (error) {
       console.error("Failed to download GIF:", error);
-      showError("Failed to download GIF.");
+      showError(t('gif_page.download_error'));
     }
   };
 
@@ -117,7 +117,7 @@ const GifPage = () => {
               <CardTitle>{title}</CardTitle>
               {gif.category && (
                 <CardDescription>
-                  In category:{" "}
+                  {t('gif_page.in_category')}{" "}
                   <Link
                     to={`/category/${gif.category.slug}`}
                     className="hover:underline text-primary"
@@ -129,7 +129,7 @@ const GifPage = () => {
             </CardHeader>
             <CardContent>
               <div className="mb-4">
-                <h4 className="font-semibold mb-2">Tags</h4>
+                <h4 className="font-semibold mb-2">{t('gif_page.tags')}</h4>
                 <div className="flex flex-wrap gap-2">
                   {gif.tags.map((tag) => (
                      <Link key={tag.id} to={`/tag/${tag.slug}`}>
@@ -141,14 +141,14 @@ const GifPage = () => {
                 </div>
               </div>
               <div className="grid grid-cols-1 gap-2">
-                 <Button onClick={() => handleCopyLink(pageUrl, "GIF Link")}>
-                    <LinkIcon className="mr-2 h-4 w-4" /> Copy GIF Link
+                 <Button onClick={() => handleCopyLink(pageUrl, "GIF")}>
+                    <LinkIcon className="mr-2 h-4 w-4" /> {t('gif_page.copy_link')}
                   </Button>
                 <Button onClick={() => handleCopyLink(markdownLink, "Markdown")}>
-                  <Copy className="mr-2 h-4 w-4" /> Copy Markdown
+                  <Copy className="mr-2 h-4 w-4" /> {t('gif_page.copy_markdown')}
                 </Button>
                 <Button onClick={handleDownload}>
-                  <Download className="mr-2 h-4 w-4" /> Download GIF
+                  <Download className="mr-2 h-4 w-4" /> {t('gif_page.download')}
                 </Button>
               </div>
             </CardContent>

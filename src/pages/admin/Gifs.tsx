@@ -3,7 +3,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { getGifs, createGif, updateGif, deleteGif, deleteGifs } from "@/services/api";
 import { Gif } from "@/types";
 import { DataTable } from "@/components/admin/DataTable";
-import { ColumnDef, RowSelectionState, SortingState, useReactTable, getCoreRowModel, getPaginationRowModel, getSortedRowModel, flexRender } from "@tanstack/react-table";
+import { ColumnDef, RowSelectionState, SortingState, useReactTable, getCoreRowModel, getPaginationRowModel, getSortedRowModel } from "@tanstack/react-table";
 import { Button } from "@/components/ui/button";
 import { ArrowUpDown, MoreHorizontal, PlusCircle, Edit, Trash2, Star, Languages } from "lucide-react";
 import {
@@ -30,9 +30,11 @@ import { Badge } from "@/components/ui/badge";
 import { showSuccess, showError } from "@/utils/toast";
 import { GifDialog, GifFormValues } from "@/components/admin/GifDialog";
 import { TranslationDialog } from "@/components/admin/TranslationDialog";
+import { useTranslation } from "react-i18next";
 
 const AdminGifsPage = () => {
   const queryClient = useQueryClient();
+  const { t } = useTranslation();
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [rowSelection, setRowSelection] = React.useState<RowSelectionState>({});
 
@@ -57,7 +59,7 @@ const AdminGifsPage = () => {
     ...mutationOptions,
     onSuccess: (...args) => {
       mutationOptions.onSuccess(...args);
-      showSuccess("GIF created successfully!");
+      showSuccess(t('admin.gifs.toast_create_success'));
     }
   });
 
@@ -66,7 +68,7 @@ const AdminGifsPage = () => {
     ...mutationOptions,
     onSuccess: (...args) => {
       mutationOptions.onSuccess(...args);
-      showSuccess("GIF updated successfully!");
+      showSuccess(t('admin.gifs.toast_update_success'));
     }
   });
 
@@ -75,7 +77,7 @@ const AdminGifsPage = () => {
     ...mutationOptions,
     onSuccess: (...args) => {
       mutationOptions.onSuccess(...args);
-      showSuccess("GIF deleted successfully!");
+      showSuccess(t('admin.gifs.toast_delete_success'));
     }
   });
 
@@ -84,7 +86,7 @@ const AdminGifsPage = () => {
     ...mutationOptions,
     onSuccess: (...args) => {
       mutationOptions.onSuccess(...args);
-      showSuccess("Selected GIFs deleted successfully!");
+      showSuccess(t('admin.gifs.toast_delete_many_success'));
     }
   });
 
@@ -123,21 +125,21 @@ const AdminGifsPage = () => {
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
-          Title (Default)
+          {t('admin.gifs.col_title')}
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       ),
     },
     {
       accessorKey: "is_featured",
-      header: "Featured",
+      header: t('admin.gifs.col_featured'),
       cell: ({ row }) => {
         return row.original.is_featured ? <Star className="h-4 w-4 text-yellow-500" /> : null;
       },
     },
     {
       accessorKey: "category",
-      header: "Category",
+      header: t('admin.gifs.col_category'),
       cell: ({ row }) => {
         const category = row.original.category;
         return <div>{category ? category.name : "Uncategorized"}</div>;
@@ -145,7 +147,7 @@ const AdminGifsPage = () => {
     },
     {
       accessorKey: "tags",
-      header: "Tags",
+      header: t('admin.gifs.col_tags'),
       cell: ({ row }) => {
         const tags = row.original.tags;
         return (
@@ -173,7 +175,7 @@ const AdminGifsPage = () => {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
-                <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                <DropdownMenuLabel>{t('admin.dialog_shared.actions')}</DropdownMenuLabel>
                 <GifDialog
                   gif={gif}
                   onSave={handleSave}
@@ -181,13 +183,13 @@ const AdminGifsPage = () => {
                 >
                   <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
                     <Edit className="mr-2 h-4 w-4" />
-                    Edit
+                    {t('admin.dialog_shared.edit')}
                   </DropdownMenuItem>
                 </GifDialog>
                  <TranslationDialog item={gif} type="gif">
                    <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
                     <Languages className="mr-2 h-4 w-4" />
-                    Translate
+                    {t('admin.dialog_shared.translate')}
                   </DropdownMenuItem>
                 </TranslationDialog>
                 <DropdownMenuSeparator />
@@ -198,20 +200,20 @@ const AdminGifsPage = () => {
                       onSelect={(e) => e.preventDefault()}
                     >
                       <Trash2 className="mr-2 h-4 w-4" />
-                      Delete
+                      {t('admin.dialog_shared.delete')}
                     </DropdownMenuItem>
                   </AlertDialogTrigger>
                   <AlertDialogContent>
                     <AlertDialogHeader>
-                      <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                      <AlertDialogTitle>{t('admin.dialog_shared.are_you_sure')}</AlertDialogTitle>
                       <AlertDialogDescription>
-                        This action cannot be undone. This will permanently delete the GIF.
+                        {t('admin.gifs.delete_single_confirm')}
                       </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
-                      <AlertDialogCancel>Cancel</AlertDialogCancel>
+                      <AlertDialogCancel>{t('admin.dialog_shared.cancel')}</AlertDialogCancel>
                       <AlertDialogAction onClick={() => deleteMutation.mutate(gif.id)}>
-                        Continue
+                        {t('admin.dialog_shared.continue')}
                       </AlertDialogAction>
                     </AlertDialogFooter>
                   </AlertDialogContent>
@@ -243,27 +245,27 @@ const AdminGifsPage = () => {
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-3xl font-bold">Manage GIFs</h1>
+        <h1 className="text-3xl font-bold">{t('admin.gifs.title')}</h1>
         <div className="flex items-center space-x-2">
           {selectedIds.length > 0 && (
             <AlertDialog>
               <AlertDialogTrigger asChild>
                 <Button variant="destructive">
                   <Trash2 className="mr-2 h-4 w-4" />
-                  Delete ({selectedIds.length})
+                  {t('admin.dialog_shared.delete')} ({selectedIds.length})
                 </Button>
               </AlertDialogTrigger>
               <AlertDialogContent>
                 <AlertDialogHeader>
-                  <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                  <AlertDialogTitle>{t('admin.dialog_shared.are_you_sure')}</AlertDialogTitle>
                   <AlertDialogDescription>
-                    This action cannot be undone. This will permanently delete {selectedIds.length} GIF(s).
+                    {t('admin.gifs.delete_many_confirm', { count: selectedIds.length })}
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
-                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogCancel>{t('admin.dialog_shared.cancel')}</AlertDialogCancel>
                   <AlertDialogAction onClick={() => deleteManyMutation.mutate(selectedIds)}>
-                    Continue
+                    {t('admin.dialog_shared.continue')}
                   </AlertDialogAction>
                 </AlertDialogFooter>
               </AlertDialogContent>
@@ -272,14 +274,14 @@ const AdminGifsPage = () => {
           <GifDialog onSave={handleSave} isSaving={createMutation.isPending}>
             <Button>
               <PlusCircle className="mr-2 h-4 w-4" />
-              Add New GIF
+              {t('admin.gifs.add_new')}
             </Button>
           </GifDialog>
         </div>
       </div>
       {isLoading && (
         <div className="rounded-md border p-4">
-          <div className="w-full text-center p-4">Loading GIFs...</div>
+          <div className="w-full text-center p-4">{t('admin.gifs.loading')}</div>
         </div>
       )}
       {!isLoading && <DataTable table={table} columns={columns} />}

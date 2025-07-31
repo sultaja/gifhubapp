@@ -7,10 +7,12 @@ import { Search } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { searchGifs } from "@/services/api";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useTranslation } from "react-i18next";
 
 const SearchPage = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const query = searchParams.get("q") || "";
 
   const [searchTerm, setSearchTerm] = useState(query);
@@ -24,11 +26,11 @@ const SearchPage = () => {
   useEffect(() => {
     setSearchTerm(query);
     if (query) {
-      document.title = `Search results for "${query}" - GifHub.App`;
+      document.title = `${t('search_page.results_for', { query })} - GifHub.App`;
     } else {
-      document.title = "Search - GifHub.App";
+      document.title = `${t('search_page.title')} - GifHub.App`;
     }
-  }, [query]);
+  }, [query, t]);
 
   const handleSearchSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -40,12 +42,12 @@ const SearchPage = () => {
   return (
     <div className="container mx-auto px-4 py-8">
       <section className="py-12">
-        <h1 className="text-3xl md:text-4xl font-bold mb-4 text-center">Search GIFs</h1>
+        <h1 className="text-3xl md:text-4xl font-bold mb-4 text-center">{t('search_page.title')}</h1>
         <div className="max-w-xl mx-auto mb-8">
           <form onSubmit={handleSearchSubmit} className="flex w-full items-center space-x-2">
             <Input
               type="search"
-              placeholder="Search by title, tag, or category..."
+              placeholder={t('home.hero.search_placeholder')}
               className="flex-1"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
@@ -59,9 +61,9 @@ const SearchPage = () => {
         {query && (
           <div className="text-center mb-8">
             <h2 className="text-2xl font-bold">
-              Results for "{query}"
+              {t('search_page.results_for', { query })}
             </h2>
-            <p className="text-muted-foreground">{filteredGifs?.length || 0} GIF(s) found</p>
+            <p className="text-muted-foreground">{t('search_page.gifs_found', { count: filteredGifs?.length || 0 })}</p>
           </div>
         )}
 
@@ -81,7 +83,7 @@ const SearchPage = () => {
           query && (
             <div className="text-center py-16">
               <p className="text-lg text-muted-foreground">
-                No GIFs found for your search. Try another term!
+                {t('search_page.no_results')}
               </p>
             </div>
           )
