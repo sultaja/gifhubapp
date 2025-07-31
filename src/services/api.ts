@@ -1,5 +1,5 @@
 import { supabase } from "@/integrations/supabase/client";
-import { Gif, Category, Tag, SiteSettings, CategoryTranslation, TagTranslation, GifTranslation } from "@/types";
+import { Gif, Category, Tag, SiteSettings, CategoryTranslation, TagTranslation, GifTranslation, ContentSection } from "@/types";
 import { GifFormValues } from "@/components/admin/GifDialog";
 
 // The base query for fetching GIFs with their related category and tags, now including translations
@@ -299,5 +299,36 @@ export const updateSiteSettings = async (settings: Partial<SiteSettings>): Promi
         console.error("Error updating site settings:", error);
         throw new Error(error.message);
     }
+    return data;
+};
+
+// --- CONTENT SECTIONS API ---
+export const getContentSections = async (): Promise<ContentSection[]> => {
+    const { data, error } = await supabase.from('content_sections').select('*');
+    if (error) throw new Error(error.message);
+    return data || [];
+};
+
+export const getContentSection = async (sectionKey: string, languageCode: string): Promise<ContentSection | null> => {
+    const { data, error } = await supabase
+        .from('content_sections')
+        .select('*')
+        .eq('section_key', sectionKey)
+        .eq('language_code', languageCode)
+        .maybeSingle();
+    if (error) {
+        console.error(`Error fetching content for ${sectionKey} [${languageCode}]`, error);
+        return null;
+    }
+    return data;
+};
+
+export const upsertContentSection = async (section: Partial<ContentSection>): Promise<ContentSection> => {
+    const { data, error } = await supabase
+        .from('content_sections')
+        .upsert(section, { onConflict: 'section_key, language_code' })
+        .select()
+        .single();
+    if (error) throw new Error(error.message);
     return data;
 };

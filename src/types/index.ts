@@ -53,3 +53,13 @@ export interface SiteSettings {
     footer_scripts?: string |null;
     page_titles?: Record<string, string> | null;
 }
+
+export interface ContentSection {
+  id: number;
+  section_key: string;
+  language_code: string;
+  title?: string | null;
+  content?: string | null;
+  meta_title?: string | null;
+  meta_description?: string | null;
+}

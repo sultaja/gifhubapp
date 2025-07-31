@@ -30,6 +30,7 @@ import AdminGifsPage from "./pages/admin/Gifs";
 import AdminCategoriesPage from "./pages/admin/Categories";
 import AdminTagsPage from "./pages/admin/Tags";
 import AdminSettingsPage from "./pages/admin/Settings";
+import AdminContentPage from "./pages/admin/Content";
 
 
 const queryClient = new QueryClient();
@@ -64,6 +65,7 @@ const App = () => (
                 <Route path="gifs" element={<AdminGifsPage />} />
                 <Route path="categories" element={<AdminCategoriesPage />} />
                 <Route path="tags" element={<AdminTagsPage />} />
+                <Route path="content" element={<AdminContentPage />} />
                 <Route path="settings" element={<AdminSettingsPage />} />
               </Route>
 

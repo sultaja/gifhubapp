@@ -1,12 +1,13 @@
 import { Link, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
-import { LayoutDashboard, GitFork, Tag, Settings, Home, FolderKanban } from "lucide-react";
+import { LayoutDashboard, GitFork, Tag, Settings, Home, FolderKanban, FileText } from "lucide-react";
 
 const navItems = [
   { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
   { href: "/admin/gifs", label: "GIFs", icon: GitFork },
   { href: "/admin/categories", label: "Categories", icon: FolderKanban },
   { href: "/admin/tags", label: "Tags", icon: Tag },
+  { href: "/admin/content", label: "Content", icon: FileText },
   { href: "/admin/settings", label: "Settings", icon: Settings },
 ];
 
