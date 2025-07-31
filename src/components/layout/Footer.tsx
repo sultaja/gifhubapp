@@ -22,23 +22,14 @@ const Footer = () => {
             <p>
               Built by{" "}
               <a
-                href="https://www.dyad.sh"
+                href="https://jamilsultanli.com"
                 target="_blank"
                 rel="noreferrer"
                 className="font-medium underline underline-offset-4 hover:text-primary"
               >
-                Dyad
+                Jamil Sultanli
               </a>
-              . Source on{" "}
-              <a
-                href="#"
-                target="_blank"
-                rel="noreferrer"
-                className="font-medium underline underline-offset-4 hover:text-primary"
-              >
-                {t('footer.github')}
-              </a>
-              .
+              
             </p>
           </div>
           <div className="grid grid-cols-2 gap-8 text-sm sm:grid-cols-3">
