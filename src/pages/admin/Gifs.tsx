@@ -4,7 +4,7 @@ import { Gif } from "@/types";
 import { DataTable } from "@/components/admin/DataTable";
 import { ColumnDef } from "@tanstack/react-table";
 import { Button } from "@/components/ui/button";
-import { ArrowUpDown, MoreHorizontal, PlusCircle, Edit, Trash2, Star } from "lucide-react";
+import { ArrowUpDown, MoreHorizontal, PlusCircle, Edit, Trash2, Star, Languages } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -28,6 +28,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
 import { showSuccess, showError } from "@/utils/toast";
 import { GifDialog, GifFormValues } from "@/components/admin/GifDialog";
+import { TranslationDialog } from "@/components/admin/TranslationDialog";
 
 const AdminGifsPage = () => {
   const queryClient = useQueryClient();
@@ -109,7 +110,7 @@ const AdminGifsPage = () => {
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
-          Title
+          Title (Default)
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       ),
@@ -170,6 +171,12 @@ const AdminGifsPage = () => {
                     Edit
                   </DropdownMenuItem>
                 </GifDialog>
+                 <TranslationDialog item={gif} type="gif">
+                   <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                    <Languages className="mr-2 h-4 w-4" />
+                    Translate
+                  </DropdownMenuItem>
+                </TranslationDialog>
                 <DropdownMenuSeparator />
                 <AlertDialog>
                   <AlertDialogTrigger asChild>

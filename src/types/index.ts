@@ -1,7 +1,29 @@
+export interface CategoryTranslation {
+  id: number;
+  category_id: string;
+  language_code: string;
+  name: string;
+}
+
+export interface TagTranslation {
+  id: number;
+  tag_id: string;
+  language_code: string;
+  name: string;
+}
+
+export interface GifTranslation {
+  id: number;
+  gif_id: string;
+  language_code: string;
+  title: string;
+}
+
 export interface Tag {
   id: string;
   name: string;
   slug: string;
+  tag_translations: TagTranslation[];
 }
 
 export interface Category {
@@ -9,6 +31,7 @@ export interface Category {
   name: string;
   slug: string;
   icon?: string;
+  category_translations: CategoryTranslation[];
 }
 
 export interface Gif {
@@ -20,6 +43,7 @@ export interface Gif {
   category: Category | null;
   submittedBy?: string;
   is_featured?: boolean;
+  gif_translations: GifTranslation[];
 }
 
 export interface SiteSettings {

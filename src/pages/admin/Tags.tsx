@@ -4,7 +4,7 @@ import { Tag } from "@/types";
 import { DataTable } from "@/components/admin/DataTable";
 import { ColumnDef } from "@tanstack/react-table";
 import { Button } from "@/components/ui/button";
-import { ArrowUpDown, MoreHorizontal, PlusCircle, Edit, Trash2 } from "lucide-react";
+import { ArrowUpDown, MoreHorizontal, PlusCircle, Edit, Trash2, Languages } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -27,6 +27,7 @@ import {
 import { Checkbox } from "@/components/ui/checkbox";
 import { showSuccess, showError } from "@/utils/toast";
 import { TagDialog, TagFormValues } from "@/components/admin/TagDialog";
+import { TranslationDialog } from "@/components/admin/TranslationDialog";
 
 const AdminTagsPage = () => {
   const queryClient = useQueryClient();
@@ -105,7 +106,7 @@ const AdminTagsPage = () => {
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
-          Name
+          Name (Default)
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       ),
@@ -139,6 +140,12 @@ const AdminTagsPage = () => {
                     Edit
                   </DropdownMenuItem>
                 </TagDialog>
+                <TranslationDialog item={tag} type="tag">
+                   <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                    <Languages className="mr-2 h-4 w-4" />
+                    Translate
+                  </DropdownMenuItem>
+                </TranslationDialog>
                 <DropdownMenuSeparator />
                 <AlertDialog>
                   <AlertDialogTrigger asChild>

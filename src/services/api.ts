@@ -1,13 +1,30 @@
 import { supabase } from "@/integrations/supabase/client";
-import { Gif, Category, Tag, SiteSettings } from "@/types";
+import { Gif, Category, Tag, SiteSettings, CategoryTranslation, TagTranslation, GifTranslation } from "@/types";
 import { GifFormValues } from "@/components/admin/GifDialog";
 
-// The base query for fetching GIFs with their related category and tags
-const BASE_GIF_QUERY = "id, title, url, slug, is_featured, category:categories(id, name, slug, icon), tags(id, name, slug)";
+// The base query for fetching GIFs with their related category and tags, now including translations
+const BASE_GIF_QUERY = "id, title, url, slug, is_featured, gif_translations(*), category:categories(id, name, slug, icon, category_translations(*)), tags(id, name, slug, tag_translations(*))";
+
+// --- TRANSLATION API ---
+export const upsertCategoryTranslations = async (translations: Partial<CategoryTranslation>[]) => {
+    const { error } = await supabase.from('category_translations').upsert(translations);
+    if (error) throw new Error(error.message);
+};
+
+export const upsertTagTranslations = async (translations: Partial<TagTranslation>[]) => {
+    const { error } = await supabase.from('tag_translations').upsert(translations);
+    if (error) throw new Error(error.message);
+};
+
+export const upsertGifTranslations = async (translations: Partial<GifTranslation>[]) => {
+    const { error } = await supabase.from('gif_translations').upsert(translations);
+    if (error) throw new Error(error.message);
+};
+
 
 // --- CATEGORY API ---
 export const getCategories = async (): Promise<Category[]> => {
-  const { data, error } = await supabase.from("categories").select("*, icon").order("name", { ascending: true });
+  const { data, error } = await supabase.from("categories").select("*, icon, category_translations(*)").order("name", { ascending: true });
   if (error) throw new Error(error.message);
   return data || [];
 };
@@ -32,7 +49,7 @@ export const deleteCategory = async (id: string) => {
 
 // --- TAG API ---
 export const getTags = async (): Promise<Tag[]> => {
-    const { data, error } = await supabase.from("tags").select("*").order("name", { ascending: true });
+    const { data, error } = await supabase.from("tags").select("*, tag_translations(*)").order("name", { ascending: true });
     if (error) throw new Error(error.message);
     return data || [];
 };
@@ -175,7 +192,7 @@ export const getGifBySlug = async (slug: string): Promise<Gif | null> => {
 };
 
 export const getGifsByCategorySlug = async (slug: string): Promise<{ category: Category | null, gifs: Gif[] }> => {
-    const { data: category, error: categoryError } = await supabase.from('categories').select('*, icon').eq('slug', slug).single();
+    const { data: category, error: categoryError } = await supabase.from('categories').select('*, icon, category_translations(*)').eq('slug', slug).single();
     if (categoryError || !category) {
         throw new Error(categoryError?.message || "Category not found");
     }
@@ -193,7 +210,7 @@ export const getGifsByCategorySlug = async (slug: string): Promise<{ category: C
 };
 
 export const getGifsByTagSlug = async (slug: string): Promise<{ tag: Tag | null, gifs: Gif[] }> => {
-    const { data: tag, error: tagError } = await supabase.from('tags').select('*').eq('slug', slug).single();
+    const { data: tag, error: tagError } = await supabase.from('tags').select('*, tag_translations(*)').eq('slug', slug).single();
     if (tagError || !tag) {
         throw new Error(tagError?.message || "Tag not found");
     }

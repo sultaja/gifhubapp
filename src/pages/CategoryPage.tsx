@@ -5,9 +5,12 @@ import NotFound from "./NotFound";
 import { useQuery } from "@tanstack/react-query";
 import { getGifsByCategorySlug } from "@/services/api";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useTranslation } from "react-i18next";
+import { getTranslatedName } from "@/lib/translations";
 
 const CategoryPage = () => {
   const { slug } = useParams<{ slug: string }>();
+  const { i18n } = useTranslation();
 
   const { data, isLoading, isError } = useQuery({
     queryKey: ["category", slug],
@@ -17,14 +20,15 @@ const CategoryPage = () => {
 
   const category = data?.category;
   const filteredGifs = data?.gifs;
+  const categoryName = getTranslatedName(category, i18n.language, 'category_translations');
 
   useEffect(() => {
     if (category) {
-      document.title = `${category.name} GIFs - GifHub.App`;
+      document.title = `${categoryName} GIFs - GifHub.App`;
     } else if (isError) {
       document.title = "Category Not Found - GifHub.App";
     }
-  }, [category, isError]);
+  }, [category, categoryName, isError]);
 
   if (isLoading) {
     return (
@@ -50,10 +54,10 @@ const CategoryPage = () => {
     <div className="container mx-auto px-4 py-8">
       <section className="py-12 text-center">
         <h1 className="text-4xl font-bold mb-2">
-          Category: {category.name}
+          Category: {categoryName}
         </h1>
         <p className="text-muted-foreground">
-          Browsing all GIFs in the "{category.name}" category.
+          Browsing all GIFs in the "{categoryName}" category.
         </p>
       </section>
 

@@ -9,9 +9,12 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { useQuery } from "@tanstack/react-query";
 import { getGifBySlug } from "@/services/api";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useTranslation } from "react-i18next";
+import { getTranslatedTitle, getTranslatedName } from "@/lib/translations";
 
 const GifPage = () => {
   const { slug } = useParams<{ slug: string }>();
+  const { i18n } = useTranslation();
 
   const { data: gif, isLoading, isError } = useQuery({
     queryKey: ["gif", slug],
@@ -19,15 +22,18 @@ const GifPage = () => {
     enabled: !!slug,
   });
 
+  const title = getTranslatedTitle(gif, i18n.language);
+  const categoryName = getTranslatedName(gif?.category, i18n.language, 'category_translations');
+
   useEffect(() => {
     if (gif) {
-      document.title = `${gif.title} - GifHub.App`;
-      const metaDescription = `Download or share the "${gif.title}" GIF. Category: ${gif.category?.name}. Tags: ${gif.tags.map(t => t.name).join(', ')}.`;
+      document.title = `${title} - GifHub.App`;
+      const metaDescription = `Download or share the "${title}" GIF. Category: ${categoryName}. Tags: ${gif.tags.map(t => getTranslatedName(t, i18n.language, 'tag_translations')).join(', ')}.`;
       document.querySelector('meta[name="description"]')?.setAttribute("content", metaDescription);
     } else {
       document.title = "GIF Not Found - GifHub.App";
     }
-  }, [gif]);
+  }, [gif, title, categoryName, i18n.language]);
 
   const handleCopyLink = (link: string, type: string) => {
     navigator.clipboard.writeText(link);
@@ -93,7 +99,7 @@ const GifPage = () => {
   }
 
   const pageUrl = window.location.href;
-  const markdownLink = `[![${gif.title}](${gif.url})](${pageUrl})`;
+  const markdownLink = `[![${title}](${gif.url})](${pageUrl})`;
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -101,14 +107,14 @@ const GifPage = () => {
         <div className="md:col-span-2">
           <img
             src={gif.url}
-            alt={gif.title}
+            alt={title}
             className="w-full h-auto rounded-lg border"
           />
         </div>
         <div>
           <Card>
             <CardHeader>
-              <CardTitle>{gif.title}</CardTitle>
+              <CardTitle>{title}</CardTitle>
               {gif.category && (
                 <CardDescription>
                   In category:{" "}
@@ -116,7 +122,7 @@ const GifPage = () => {
                     to={`/category/${gif.category.slug}`}
                     className="hover:underline text-primary"
                   >
-                    {gif.category.name}
+                    {categoryName}
                   </Link>
                 </CardDescription>
               )}
@@ -128,7 +134,7 @@ const GifPage = () => {
                   {gif.tags.map((tag) => (
                      <Link key={tag.id} to={`/tag/${tag.slug}`}>
                       <Badge variant="secondary" className="hover:bg-accent">
-                        #{tag.name}
+                        #{getTranslatedName(tag, i18n.language, 'tag_translations')}
                       </Badge>
                     </Link>
                   ))}
