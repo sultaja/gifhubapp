@@ -34,6 +34,7 @@ import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { getCategories } from "@/services/api";
 import { useTranslation } from "react-i18next";
+import { createSlug } from "@/utils/slug";
 
 const formSchema = z.object({
   name: z.string().min(2, {
@@ -54,13 +55,6 @@ interface CategoryDialogProps {
   onSave: (values: z.infer<typeof formSchema>, categoryId?: string) => void;
   isSaving: boolean;
 }
-
-const generateSlug = (name: string) => {
-  return name
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/(^-|-$)/g, "");
-};
 
 export function CategoryDialog({ children, category, onSave, isSaving }: CategoryDialogProps) {
   const { t } = useTranslation();
@@ -93,7 +87,7 @@ export function CategoryDialog({ children, category, onSave, isSaving }: Categor
   const nameValue = form.watch("name");
   useEffect(() => {
     if (!dirtyFields.slug) {
-      form.setValue("slug", generateSlug(nameValue), { shouldValidate: true });
+      form.setValue("slug", createSlug(nameValue), { shouldValidate: true });
     }
   }, [nameValue, dirtyFields.slug, form]);
 

@@ -35,6 +35,7 @@ import { useQuery } from "@tanstack/react-query";
 import { getCategories, getTags } from "@/services/api";
 import { useTranslation } from "react-i18next";
 import { MultiSelectCombobox } from "@/components/ui/MultiSelectCombobox";
+import { createSlug } from "@/utils/slug";
 
 const formSchema = z.object({
   title: z.string().min(3, "Title must be at least 3 characters long."),
@@ -53,13 +54,6 @@ interface GifDialogProps {
   onSave: (values: GifFormValues, gifId?: string) => void;
   isSaving: boolean;
 }
-
-const generateSlug = (name: string) => {
-  return name
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/(^-|-$)/g, "");
-};
 
 export function GifDialog({ children, gif, onSave, isSaving }: GifDialogProps) {
   const { t } = useTranslation();
@@ -116,7 +110,7 @@ export function GifDialog({ children, gif, onSave, isSaving }: GifDialogProps) {
   const titleValue = form.watch("title");
   useEffect(() => {
     if (!form.getValues("slug") || !gif) {
-      form.setValue("slug", generateSlug(titleValue));
+      form.setValue("slug", createSlug(titleValue));
     }
   }, [titleValue, form, gif]);
 

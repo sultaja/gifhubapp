@@ -24,6 +24,7 @@ import * as z from "zod";
 import { Tag } from "@/types";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { createSlug } from "@/utils/slug";
 
 const formSchema = z.object({
   name: z.string().min(2, {
@@ -42,13 +43,6 @@ interface TagDialogProps {
   onSave: (values: z.infer<typeof formSchema>, tagId?: string) => void;
   isSaving: boolean;
 }
-
-const generateSlug = (name: string) => {
-  return name
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/(^-|-$)/g, "");
-};
 
 export function TagDialog({ children, tag, onSave, isSaving }: TagDialogProps) {
   const { t } = useTranslation();
@@ -75,7 +69,7 @@ export function TagDialog({ children, tag, onSave, isSaving }: TagDialogProps) {
   const nameValue = form.watch("name");
   useEffect(() => {
     if (!dirtyFields.slug) {
-      form.setValue("slug", generateSlug(nameValue), { shouldValidate: true });
+      form.setValue("slug", createSlug(nameValue), { shouldValidate: true });
     }
   }, [nameValue, dirtyFields.slug, form]);
 
