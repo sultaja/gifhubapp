@@ -57,8 +57,8 @@ const AdminGifsPage = () => {
   const createMutation = useMutation({
     mutationFn: (newGif: GifFormValues) => createGif(newGif),
     ...mutationOptions,
-    onSuccess: (...args) => {
-      mutationOptions.onSuccess(...args);
+    onSuccess: () => {
+      mutationOptions.onSuccess();
       showSuccess(t('admin.gifs.toast_create_success'));
     }
   });
@@ -66,8 +66,8 @@ const AdminGifsPage = () => {
   const updateMutation = useMutation({
     mutationFn: ({ id, values }: { id: string, values: GifFormValues }) => updateGif(id, values),
     ...mutationOptions,
-    onSuccess: (...args) => {
-      mutationOptions.onSuccess(...args);
+    onSuccess: () => {
+      mutationOptions.onSuccess();
       showSuccess(t('admin.gifs.toast_update_success'));
     }
   });
@@ -75,8 +75,8 @@ const AdminGifsPage = () => {
   const deleteMutation = useMutation({
     mutationFn: (id: string) => deleteGif(id),
     ...mutationOptions,
-    onSuccess: (...args) => {
-      mutationOptions.onSuccess(...args);
+    onSuccess: () => {
+      mutationOptions.onSuccess();
       showSuccess(t('admin.gifs.toast_delete_success'));
     }
   });
@@ -84,8 +84,8 @@ const AdminGifsPage = () => {
   const deleteManyMutation = useMutation({
     mutationFn: (ids: string[]) => deleteGifs(ids),
     ...mutationOptions,
-    onSuccess: (...args) => {
-      mutationOptions.onSuccess(...args);
+    onSuccess: () => {
+      mutationOptions.onSuccess();
       showSuccess(t('admin.gifs.toast_delete_many_success'));
     }
   });

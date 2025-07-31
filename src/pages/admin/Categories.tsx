@@ -56,8 +56,8 @@ const AdminCategoriesPage = () => {
   const createMutation = useMutation({
     mutationFn: (newCategory: Omit<Category, 'id'>) => createCategory(newCategory),
     ...mutationOptions,
-    onSuccess: (...args) => {
-      mutationOptions.onSuccess(...args);
+    onSuccess: () => {
+      mutationOptions.onSuccess();
       showSuccess(t('admin.categories.toast_create_success'));
     }
   });
@@ -65,8 +65,8 @@ const AdminCategoriesPage = () => {
   const updateMutation = useMutation({
     mutationFn: ({ id, values }: { id: string, values: CategoryFormValues }) => updateCategory(id, values),
     ...mutationOptions,
-    onSuccess: (...args) => {
-      mutationOptions.onSuccess(...args);
+    onSuccess: () => {
+      mutationOptions.onSuccess();
       showSuccess(t('admin.categories.toast_update_success'));
     }
   });
@@ -74,8 +74,8 @@ const AdminCategoriesPage = () => {
   const deleteMutation = useMutation({
     mutationFn: (id: string) => deleteCategory(id),
     ...mutationOptions,
-    onSuccess: (...args) => {
-      mutationOptions.onSuccess(...args);
+    onSuccess: () => {
+      mutationOptions.onSuccess();
       showSuccess(t('admin.categories.toast_delete_success'));
     }
   });
@@ -83,8 +83,8 @@ const AdminCategoriesPage = () => {
   const deleteManyMutation = useMutation({
     mutationFn: (ids: string[]) => deleteCategories(ids),
     ...mutationOptions,
-    onSuccess: (...args) => {
-      mutationOptions.onSuccess(...args);
+    onSuccess: () => {
+      mutationOptions.onSuccess();
       showSuccess(t('admin.categories.toast_delete_many_success'));
     }
   });
@@ -98,7 +98,11 @@ const AdminCategoriesPage = () => {
     if (categoryId) {
       updateMutation.mutate({ id: categoryId, values: categoryData });
     } else {
-      createMutation.mutate({ ...categoryData, category_translations: [] });
+      const newCategory: Omit<Category, 'id'> = {
+        ...categoryData,
+        category_translations: [],
+      };
+      createMutation.mutate(newCategory);
     }
   };
 

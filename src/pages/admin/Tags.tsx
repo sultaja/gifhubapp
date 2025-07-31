@@ -53,10 +53,10 @@ const AdminTagsPage = () => {
   };
 
   const createMutation = useMutation({
-    mutationFn: (newTag: Omit<Tag, 'id' | 'tag_translations'> & { tag_translations: [] }) => createTag(newTag),
+    mutationFn: (newTag: Omit<Tag, 'id'>) => createTag(newTag),
     ...mutationOptions,
-    onSuccess: (...args) => {
-      mutationOptions.onSuccess(...args);
+    onSuccess: () => {
+      mutationOptions.onSuccess();
       showSuccess(t('admin.tags.toast_create_success'));
     }
   });
@@ -64,8 +64,8 @@ const AdminTagsPage = () => {
   const updateMutation = useMutation({
     mutationFn: ({ id, values }: { id: string, values: TagFormValues }) => updateTag(id, values),
     ...mutationOptions,
-    onSuccess: (...args) => {
-      mutationOptions.onSuccess(...args);
+    onSuccess: () => {
+      mutationOptions.onSuccess();
       showSuccess(t('admin.tags.toast_update_success'));
     }
   });
@@ -73,8 +73,8 @@ const AdminTagsPage = () => {
   const deleteMutation = useMutation({
     mutationFn: (id: string) => deleteTag(id),
     ...mutationOptions,
-    onSuccess: (...args) => {
-      mutationOptions.onSuccess(...args);
+    onSuccess: () => {
+      mutationOptions.onSuccess();
       showSuccess(t('admin.tags.toast_delete_success'));
     }
   });
@@ -82,8 +82,8 @@ const AdminTagsPage = () => {
   const deleteManyMutation = useMutation({
     mutationFn: (ids: string[]) => deleteTags(ids),
     ...mutationOptions,
-    onSuccess: (...args) => {
-      mutationOptions.onSuccess(...args);
+    onSuccess: () => {
+      mutationOptions.onSuccess();
       showSuccess(t('admin.tags.toast_delete_many_success'));
     }
   });
