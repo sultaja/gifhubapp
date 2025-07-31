@@ -64,7 +64,7 @@ const SubmitGifPage = () => {
     },
   });
 
-  const onSubmit = async (values: z.infer<typeof formSchema>>) => {
+  const onSubmit = async (values: z.infer<typeof formSchema>) => {
     setIsSubmitting(true);
     const toastId = showLoading(t('submit_page.toast.submitting'));
 
