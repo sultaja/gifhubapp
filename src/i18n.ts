@@ -2,7 +2,7 @@ import i18n from "i18next";
 import { initReactI18next } from "react-i18next";
 import LanguageDetector from "i18next-browser-languagedetector";
 import { getUiTranslations, upsertUiTranslation } from "./services/api";
-import { resources, defaultTranslations } from "./lib/translations";
+import { resources, defaultTranslations } from "@/lib/translations";
 
 export const supportedLngs = {
   en: "English",
