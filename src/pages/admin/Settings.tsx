@@ -11,6 +11,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { showSuccess, showError } from "@/utils/toast";
 import { useEffect } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useTranslation } from "react-i18next";
 
 const formSchema = z.object({
   logo_url: z.string().url().or(z.literal("")).optional(),
@@ -32,6 +33,7 @@ const managedPages = [
 ];
 
 const AdminSettingsPage = () => {
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
 
   const { data: settings, isLoading } = useQuery({
@@ -43,7 +45,7 @@ const AdminSettingsPage = () => {
     mutationFn: (values: SettingsFormValues) => updateSiteSettings(values),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["siteSettings"] });
-      showSuccess("Settings updated successfully!");
+      showSuccess(t('admin.settings.toast_save_success'));
     },
     onError: (error: Error) => {
       showError(error.message);
@@ -72,7 +74,7 @@ const AdminSettingsPage = () => {
   if (isLoading) {
     return (
       <div>
-        <h1 className="text-3xl font-bold mb-6">Site Settings</h1>
+        <h1 className="text-3xl font-bold mb-6">{t('admin.settings.title')}</h1>
         <Skeleton className="w-full h-96" />
       </div>
     );
@@ -80,13 +82,13 @@ const AdminSettingsPage = () => {
 
   return (
     <div>
-      <h1 className="text-3xl font-bold mb-6">Site Settings</h1>
+      <h1 className="text-3xl font-bold mb-6">{t('admin.settings.title')}</h1>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
           <Card>
             <CardHeader>
-              <CardTitle>Branding</CardTitle>
-              <CardDescription>Manage your site's logo.</CardDescription>
+              <CardTitle>{t('admin.settings.branding_title')}</CardTitle>
+              <CardDescription>{t('admin.settings.branding_desc')}</CardDescription>
             </CardHeader>
             <CardContent>
               <FormField
@@ -94,11 +96,11 @@ const AdminSettingsPage = () => {
                 name="logo_url"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Logo URL</FormLabel>
+                    <FormLabel>{t('admin.settings.logo_url')}</FormLabel>
                     <FormControl>
                       <Input placeholder="https://your-cdn.com/logo.svg" {...field} value={field.value ?? ""} />
                     </FormControl>
-                    <FormDescription>Enter the full URL of your logo image.</FormDescription>
+                    <FormDescription>{t('admin.settings.logo_url_desc')}</FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -108,8 +110,8 @@ const AdminSettingsPage = () => {
 
           <Card>
             <CardHeader>
-              <CardTitle>Page Titles (SEO)</CardTitle>
-              <CardDescription>Set custom titles for your main pages.</CardDescription>
+              <CardTitle>{t('admin.settings.seo_title')}</CardTitle>
+              <CardDescription>{t('admin.settings.seo_desc')}</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               {managedPages.map((page) => (
@@ -133,8 +135,8 @@ const AdminSettingsPage = () => {
 
           <Card>
             <CardHeader>
-              <CardTitle>Custom Scripts</CardTitle>
-              <CardDescription>Add custom HTML/scripts to your site's header or footer. Use with caution.</CardDescription>
+              <CardTitle>{t('admin.settings.scripts_title')}</CardTitle>
+              <CardDescription>{t('admin.settings.scripts_desc')}</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <FormField
@@ -142,11 +144,11 @@ const AdminSettingsPage = () => {
                 name="header_scripts"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Header Scripts</FormLabel>
+                    <FormLabel>{t('admin.settings.header_scripts')}</FormLabel>
                     <FormControl>
                       <Textarea placeholder="<style>...</style> or <script>...</script>" {...field} value={field.value ?? ""} rows={5} />
                     </FormControl>
-                    <FormDescription>Scripts will be added before the closing `&lt;/head&gt;` tag.</FormDescription>
+                    <FormDescription>{t('admin.settings.header_scripts_desc')}</FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -156,11 +158,11 @@ const AdminSettingsPage = () => {
                 name="footer_scripts"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Footer Scripts</FormLabel>
+                    <FormLabel>{t('admin.settings.footer_scripts')}</FormLabel>
                     <FormControl>
                       <Textarea placeholder="<script>...</script> for analytics, etc." {...field} value={field.value ?? ""} rows={5} />
                     </FormControl>
-                    <FormDescription>Scripts will be added before the closing `&lt;/body&gt;` tag.</FormDescription>
+                    <FormDescription>{t('admin.settings.footer_scripts_desc')}</FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -169,7 +171,7 @@ const AdminSettingsPage = () => {
           </Card>
 
           <Button type="submit" disabled={mutation.isPending}>
-            {mutation.isPending ? "Saving..." : "Save Settings"}
+            {mutation.isPending ? t('admin.dialog_shared.saving') : t('admin.settings.save_button')}
           </Button>
         </form>
       </Form>

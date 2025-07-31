@@ -17,6 +17,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { showSuccess, showError } from "@/utils/toast";
 import { supportedLngs } from "@/i18n";
 import { upsertCategoryTranslations, upsertTagTranslations, upsertGifTranslations } from "@/services/api";
+import { useTranslation } from "react-i18next";
 
 type TranslatableItem = {
   id: string;
@@ -32,6 +33,7 @@ interface TranslationDialogProps {
 }
 
 export function TranslationDialog({ children, item, type }: TranslationDialogProps) {
+  const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const [translations, setTranslations] = useState<Record<string, Record<string, string>>>({});
   const queryClient = useQueryClient();
@@ -117,9 +119,9 @@ export function TranslationDialog({ children, item, type }: TranslationDialogPro
       <DialogTrigger asChild>{children}</DialogTrigger>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Manage Translations</DialogTitle>
+          <DialogTitle>{t('admin.translation_dialog.title')}</DialogTitle>
           <DialogDescription>
-            Add or edit translations for "{item.name || item.title}" in different languages.
+            {t('admin.translation_dialog.description', { item: item.name || item.title })}
           </DialogDescription>
         </DialogHeader>
         <Tabs defaultValue={Object.keys(supportedLngs)[0]} className="w-full">
@@ -147,10 +149,10 @@ export function TranslationDialog({ children, item, type }: TranslationDialogPro
         </Tabs>
         <DialogFooter>
           <DialogClose asChild>
-            <Button type="button" variant="secondary">Cancel</Button>
+            <Button type="button" variant="secondary">{t('admin.dialog_shared.cancel')}</Button>
           </DialogClose>
           <Button onClick={handleSave} disabled={mutation.isPending}>
-            {mutation.isPending ? "Saving..." : "Save Translations"}
+            {mutation.isPending ? t('admin.dialog_shared.saving') : t('admin.translation_dialog.save_button')}
           </Button>
         </DialogFooter>
       </DialogContent>

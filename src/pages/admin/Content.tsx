@@ -14,6 +14,7 @@ import * as z from "zod";
 import { supportedLngs } from "@/i18n";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useMemo } from "react";
+import { useTranslation } from "react-i18next";
 
 const manageableSections = [
   { key: 'about', name: 'About Page' },
@@ -39,12 +40,13 @@ interface ContentSectionFormProps {
 }
 
 const ContentSectionForm = ({ sectionKey, sectionName, initialData }: ContentSectionFormProps) => {
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
   const mutation = useMutation({
     mutationFn: (section: Partial<ContentSection>) => upsertContentSection(section),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["contentSections"] });
-      showSuccess(`Content for "${sectionName}" saved successfully!`);
+      showSuccess(t('admin.content.toast_save_success', { sectionName }));
     },
     onError: (error: Error) => {
       showError(error.message);
@@ -98,7 +100,7 @@ const ContentSectionForm = ({ sectionKey, sectionName, initialData }: ContentSec
                       name={`${code}.title`}
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Page Title</FormLabel>
+                          <FormLabel>{t('admin.content.form_title')}</FormLabel>
                           <FormControl><Input {...field} value={field.value ?? ""} /></FormControl>
                           <FormMessage />
                         </FormItem>
@@ -109,7 +111,7 @@ const ContentSectionForm = ({ sectionKey, sectionName, initialData }: ContentSec
                       name={`${code}.content`}
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Page Content (HTML allowed)</FormLabel>
+                          <FormLabel>{t('admin.content.form_content')}</FormLabel>
                           <FormControl><Textarea {...field} value={field.value ?? ""} rows={10} /></FormControl>
                           <FormMessage />
                         </FormItem>
@@ -120,7 +122,7 @@ const ContentSectionForm = ({ sectionKey, sectionName, initialData }: ContentSec
                       name={`${code}.meta_title`}
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Meta Title (for SEO)</FormLabel>
+                          <FormLabel>{t('admin.content.form_meta_title')}</FormLabel>
                           <FormControl><Input {...field} value={field.value ?? ""} /></FormControl>
                           <FormMessage />
                         </FormItem>
@@ -131,7 +133,7 @@ const ContentSectionForm = ({ sectionKey, sectionName, initialData }: ContentSec
                       name={`${code}.meta_description`}
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Meta Description (for SEO)</FormLabel>
+                          <FormLabel>{t('admin.content.form_meta_desc')}</FormLabel>
                           <FormControl><Textarea {...field} value={field.value ?? ""} rows={3} /></FormControl>
                           <FormMessage />
                         </FormItem>
@@ -142,7 +144,7 @@ const ContentSectionForm = ({ sectionKey, sectionName, initialData }: ContentSec
               ))}
             </Tabs>
             <Button type="submit" disabled={mutation.isPending}>
-              {mutation.isPending ? "Saving..." : `Save ${sectionName}`}
+              {mutation.isPending ? t('admin.dialog_shared.saving') : t('admin.content.save_button', { sectionName })}
             </Button>
           </form>
         </Form>
@@ -153,6 +155,7 @@ const ContentSectionForm = ({ sectionKey, sectionName, initialData }: ContentSec
 
 
 const AdminContentPage = () => {
+  const { t } = useTranslation();
   const { data: contentSections, isLoading } = useQuery({
     queryKey: ["contentSections"],
     queryFn: getContentSections,
@@ -172,7 +175,7 @@ const AdminContentPage = () => {
   if (isLoading) {
     return (
       <div>
-        <h1 className="text-3xl font-bold mb-6">Manage Page Content</h1>
+        <h1 className="text-3xl font-bold mb-6">{t('admin.content.title')}</h1>
         <div className="space-y-8">
           {manageableSections.map(section => <Skeleton key={section.key} className="w-full h-96" />)}
         </div>
@@ -182,7 +185,7 @@ const AdminContentPage = () => {
 
   return (
     <div>
-      <h1 className="text-3xl font-bold mb-6">Manage Page Content</h1>
+      <h1 className="text-3xl font-bold mb-6">{t('admin.content.title')}</h1>
       <div className="space-y-8">
         {manageableSections.map(section => (
           <ContentSectionForm

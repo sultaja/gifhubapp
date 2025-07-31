@@ -33,6 +33,7 @@ import { Gif, Category, Tag } from "@/types";
 import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { getCategories, getTags } from "@/services/api";
+import { useTranslation } from "react-i18next";
 
 const formSchema = z.object({
   title: z.string().min(3, "Title must be at least 3 characters long."),
@@ -60,6 +61,7 @@ const generateSlug = (name: string) => {
 };
 
 export function GifDialog({ children, gif, onSave, isSaving }: GifDialogProps) {
+  const { t } = useTranslation();
   const [open, setOpen] = useState(false);
 
   const { data: categories, isLoading: isLoadingCategories } = useQuery<Category[]>({
@@ -123,11 +125,11 @@ export function GifDialog({ children, gif, onSave, isSaving }: GifDialogProps) {
       <DialogTrigger asChild>{children}</DialogTrigger>
       <DialogContent className="sm:max-w-lg">
         <DialogHeader>
-          <DialogTitle>{gif ? "Edit GIF" : "Add New GIF"}</DialogTitle>
+          <DialogTitle>{gif ? t('admin.gif_dialog.edit_title') : t('admin.gif_dialog.add_title')}</DialogTitle>
           <DialogDescription>
             {gif
-              ? "Update the details for this GIF."
-              : "Add a new GIF to the collection."}
+              ? t('admin.gif_dialog.edit_desc')
+              : t('admin.gif_dialog.add_desc')}
           </DialogDescription>
         </DialogHeader>
         <Form {...form}>
@@ -137,9 +139,9 @@ export function GifDialog({ children, gif, onSave, isSaving }: GifDialogProps) {
               name="title"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Title</FormLabel>
+                  <FormLabel>{t('admin.gif_dialog.title')}</FormLabel>
                   <FormControl>
-                    <Input placeholder="e.g., Michael Scott Celebrates" {...field} />
+                    <Input placeholder={t('admin.gif_dialog.title_placeholder')} {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -150,9 +152,9 @@ export function GifDialog({ children, gif, onSave, isSaving }: GifDialogProps) {
               name="slug"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Slug</FormLabel>
+                  <FormLabel>{t('admin.gif_dialog.slug')}</FormLabel>
                   <FormControl>
-                    <Input placeholder="e.g., michael-scott-celebrates" {...field} />
+                    <Input placeholder={t('admin.gif_dialog.slug_placeholder')} {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -163,7 +165,7 @@ export function GifDialog({ children, gif, onSave, isSaving }: GifDialogProps) {
               name="url"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>GIF URL</FormLabel>
+                  <FormLabel>{t('admin.gif_dialog.url')}</FormLabel>
                   <FormControl>
                     <Input placeholder="https://media.giphy.com/..." {...field} />
                   </FormControl>
@@ -176,16 +178,16 @@ export function GifDialog({ children, gif, onSave, isSaving }: GifDialogProps) {
               name="category_id"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Category</FormLabel>
+                  <FormLabel>{t('admin.gif_dialog.category')}</FormLabel>
                   <Select onValueChange={field.onChange} value={field.value}>
                     <FormControl>
                       <SelectTrigger>
-                        <SelectValue placeholder="Select a category" />
+                        <SelectValue placeholder={t('admin.gif_dialog.category_placeholder')} />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
                       {isLoadingCategories ? (
-                        <SelectItem value="loading" disabled>Loading...</SelectItem>
+                        <SelectItem value="loading" disabled>{t('submit_page.form.loading')}</SelectItem>
                       ) : (
                         categories?.map((cat) => (
                           <SelectItem key={cat.id} value={cat.id}>
@@ -204,7 +206,7 @@ export function GifDialog({ children, gif, onSave, isSaving }: GifDialogProps) {
               name="tags"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Tags</FormLabel>
+                  <FormLabel>{t('admin.gif_dialog.tags')}</FormLabel>
                   <FormControl>
                     <select
                         multiple
@@ -217,7 +219,7 @@ export function GifDialog({ children, gif, onSave, isSaving }: GifDialogProps) {
                         }}
                     >
                         {isLoadingTags ? (
-                            <option value="loading" disabled>Loading...</option>
+                            <option value="loading" disabled>{t('submit_page.form.loading')}</option>
                         ) : (
                             tags?.map((tag) => (
                                 <option key={tag.id} value={tag.id}>
@@ -237,7 +239,7 @@ export function GifDialog({ children, gif, onSave, isSaving }: GifDialogProps) {
               render={({ field }) => (
                 <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
                   <div className="space-y-0.5">
-                    <FormLabel>Featured GIF</FormLabel>
+                    <FormLabel>{t('admin.gif_dialog.featured')}</FormLabel>
                     <FormMessage />
                   </div>
                   <FormControl>
@@ -252,11 +254,11 @@ export function GifDialog({ children, gif, onSave, isSaving }: GifDialogProps) {
             <DialogFooter className="pt-4">
               <DialogClose asChild>
                 <Button type="button" variant="secondary">
-                  Cancel
+                  {t('admin.dialog_shared.cancel')}
                 </Button>
               </DialogClose>
               <Button type="submit" disabled={isSaving}>
-                {isSaving ? "Saving..." : "Save GIF"}
+                {isSaving ? t('admin.dialog_shared.saving') : t('admin.gif_dialog.save_button')}
               </Button>
             </DialogFooter>
           </form>

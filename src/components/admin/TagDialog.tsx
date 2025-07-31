@@ -23,6 +23,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { Tag } from "@/types";
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 
 const formSchema = z.object({
   name: z.string().min(2, {
@@ -50,6 +51,7 @@ const generateSlug = (name: string) => {
 };
 
 export function TagDialog({ children, tag, onSave, isSaving }: TagDialogProps) {
+  const { t } = useTranslation();
   const [open, setOpen] = useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -85,11 +87,11 @@ export function TagDialog({ children, tag, onSave, isSaving }: TagDialogProps) {
       <DialogTrigger asChild>{children}</DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>{tag ? "Edit Tag" : "Add New Tag"}</DialogTitle>
+          <DialogTitle>{tag ? t('admin.tag_dialog.edit_title') : t('admin.tag_dialog.add_title')}</DialogTitle>
           <DialogDescription>
             {tag
-              ? "Update the details for this tag."
-              : "Create a new tag to help categorize your GIFs."}
+              ? t('admin.tag_dialog.edit_desc')
+              : t('admin.tag_dialog.add_desc')}
           </DialogDescription>
         </DialogHeader>
         <Form {...form}>
@@ -99,9 +101,9 @@ export function TagDialog({ children, tag, onSave, isSaving }: TagDialogProps) {
               name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Name</FormLabel>
+                  <FormLabel>{t('admin.tag_dialog.name')}</FormLabel>
                   <FormControl>
-                    <Input placeholder="e.g., Success" {...field} />
+                    <Input placeholder={t('admin.tag_dialog.name_placeholder')} {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -112,9 +114,9 @@ export function TagDialog({ children, tag, onSave, isSaving }: TagDialogProps) {
               name="slug"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Slug</FormLabel>
+                  <FormLabel>{t('admin.tag_dialog.slug')}</FormLabel>
                   <FormControl>
-                    <Input placeholder="e.g., success" {...field} />
+                    <Input placeholder={t('admin.tag_dialog.slug_placeholder')} {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -123,11 +125,11 @@ export function TagDialog({ children, tag, onSave, isSaving }: TagDialogProps) {
             <DialogFooter>
               <DialogClose asChild>
                 <Button type="button" variant="secondary">
-                  Cancel
+                  {t('admin.dialog_shared.cancel')}
                 </Button>
               </DialogClose>
               <Button type="submit" disabled={isSaving}>
-                {isSaving ? "Saving..." : "Save Tag"}
+                {isSaving ? t('admin.dialog_shared.saving') : t('admin.tag_dialog.save_button')}
               </Button>
             </DialogFooter>
           </form>

@@ -33,6 +33,7 @@ import { Category } from "@/types";
 import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { getCategories } from "@/services/api";
+import { useTranslation } from "react-i18next";
 
 const formSchema = z.object({
   name: z.string().min(2, {
@@ -62,6 +63,7 @@ const generateSlug = (name: string) => {
 };
 
 export function CategoryDialog({ children, category, onSave, isSaving }: CategoryDialogProps) {
+  const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const { data: allCategories, isLoading: isLoadingCategories } = useQuery({
     queryKey: ["adminCategories"],
@@ -103,11 +105,11 @@ export function CategoryDialog({ children, category, onSave, isSaving }: Categor
       <DialogTrigger asChild>{children}</DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>{category ? "Edit Category" : "Add New Category"}</DialogTitle>
+          <DialogTitle>{category ? t('admin.category_dialog.edit_title') : t('admin.category_dialog.add_title')}</DialogTitle>
           <DialogDescription>
             {category
-              ? "Update the details for this category."
-              : "Create a new category to organize your GIFs."}
+              ? t('admin.category_dialog.edit_desc')
+              : t('admin.category_dialog.add_desc')}
           </DialogDescription>
         </DialogHeader>
         <Form {...form}>
@@ -117,9 +119,9 @@ export function CategoryDialog({ children, category, onSave, isSaving }: Categor
               name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Name</FormLabel>
+                  <FormLabel>{t('admin.category_dialog.name')}</FormLabel>
                   <FormControl>
-                    <Input placeholder="e.g., Team Meetings" {...field} />
+                    <Input placeholder={t('admin.category_dialog.name_placeholder')} {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -130,9 +132,9 @@ export function CategoryDialog({ children, category, onSave, isSaving }: Categor
               name="slug"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Slug</FormLabel>
+                  <FormLabel>{t('admin.category_dialog.slug')}</FormLabel>
                   <FormControl>
-                    <Input placeholder="e.g., team-meetings" {...field} />
+                    <Input placeholder={t('admin.category_dialog.slug_placeholder')} {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -143,17 +145,17 @@ export function CategoryDialog({ children, category, onSave, isSaving }: Categor
               name="parent_id"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Parent Category</FormLabel>
+                  <FormLabel>{t('admin.category_dialog.parent')}</FormLabel>
                   <Select onValueChange={(value) => field.onChange(value === "none" ? null : value)} value={field.value || "none"}>
                     <FormControl>
                       <SelectTrigger>
-                        <SelectValue placeholder="Select a parent category" />
+                        <SelectValue placeholder={t('admin.category_dialog.parent_placeholder')} />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      <SelectItem value="none">None (Top-level)</SelectItem>
+                      <SelectItem value="none">{t('admin.category_dialog.parent_none')}</SelectItem>
                       {isLoadingCategories ? (
-                        <SelectItem value="loading" disabled>Loading...</SelectItem>
+                        <SelectItem value="loading" disabled>{t('submit_page.form.loading')}</SelectItem>
                       ) : (
                         allCategories?.filter(c => c.id !== category?.id).map((cat) => (
                           <SelectItem key={cat.id} value={cat.id}>
@@ -164,7 +166,7 @@ export function CategoryDialog({ children, category, onSave, isSaving }: Categor
                     </SelectContent>
                   </Select>
                   <FormDescription>
-                    Assign a parent to create a sub-category.
+                    {t('admin.category_dialog.parent_desc')}
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
@@ -175,12 +177,12 @@ export function CategoryDialog({ children, category, onSave, isSaving }: Categor
               name="icon"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Icon Name</FormLabel>
+                  <FormLabel>{t('admin.category_dialog.icon')}</FormLabel>
                   <FormControl>
-                    <Input placeholder="e.g., Rocket" {...field} value={field.value || ""} />
+                    <Input placeholder={t('admin.category_dialog.icon_placeholder')} {...field} value={field.value || ""} />
                   </FormControl>
                   <FormDescription>
-                    Enter a valid icon name from Lucide React. (For parent categories)
+                    {t('admin.category_dialog.icon_desc')}
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
@@ -189,11 +191,11 @@ export function CategoryDialog({ children, category, onSave, isSaving }: Categor
             <DialogFooter>
               <DialogClose asChild>
                 <Button type="button" variant="secondary">
-                  Cancel
+                  {t('admin.dialog_shared.cancel')}
                 </Button>
               </DialogClose>
               <Button type="submit" disabled={isSaving}>
-                {isSaving ? "Saving..." : "Save Category"}
+                {isSaving ? t('admin.dialog_shared.saving') : t('admin.category_dialog.save_button')}
               </Button>
             </DialogFooter>
           </form>

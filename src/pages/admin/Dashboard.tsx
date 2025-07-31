@@ -3,8 +3,10 @@ import { getStats } from "@/services/api";
 import { useQuery } from "@tanstack/react-query";
 import { GitFork, Tag, FolderKanban } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useTranslation } from "react-i18next";
 
 const Dashboard = () => {
+  const { t } = useTranslation();
   const { data: stats, isLoading } = useQuery({
     queryKey: ["adminStats"],
     queryFn: getStats,
@@ -12,11 +14,11 @@ const Dashboard = () => {
 
   return (
     <div>
-      <h1 className="text-3xl font-bold mb-6">Dashboard</h1>
+      <h1 className="text-3xl font-bold mb-6">{t('admin.dashboard.title')}</h1>
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total GIFs</CardTitle>
+            <CardTitle className="text-sm font-medium">{t('admin.dashboard.total_gifs')}</CardTitle>
             <GitFork className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -26,7 +28,7 @@ const Dashboard = () => {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              Total Categories
+              {t('admin.dashboard.total_categories')}
             </CardTitle>
             <FolderKanban className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
@@ -36,7 +38,7 @@ const Dashboard = () => {
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Tags</CardTitle>
+            <CardTitle className="text-sm font-medium">{t('admin.dashboard.total_tags')}</CardTitle>
             <Tag className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -45,9 +47,9 @@ const Dashboard = () => {
         </Card>
       </div>
       <div className="mt-8">
-        <h2 className="text-2xl font-bold mb-4">Welcome to the Admin Panel</h2>
+        <h2 className="text-2xl font-bold mb-4">{t('admin.dashboard.welcome_title')}</h2>
         <p className="text-muted-foreground">
-          Here you can manage all the content on GifHub.App. Use the sidebar to navigate between GIFs, categories, and tags.
+          {t('admin.dashboard.welcome_subtitle')}
         </p>
       </div>
     </div>

@@ -10,14 +10,14 @@ import { Globe } from "lucide-react";
 import { supportedLngs } from "@/i18n";
 
 export function LanguageSwitcher() {
-  const { i18n } = useTranslation();
+  const { i18n, t } = useTranslation();
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="outline" size="icon">
           <Globe className="h-[1.2rem] w-[1.2rem]" />
-          <span className="sr-only">Change language</span>
+          <span className="sr-only">{t('language_switcher.toggle')}</span>
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">

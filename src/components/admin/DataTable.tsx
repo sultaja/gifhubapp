@@ -3,6 +3,7 @@ import {
   flexRender,
   Table as TanstackTable,
 } from "@tanstack/react-table"
+import { useTranslation } from "react-i18next";
 
 import {
   Table,
@@ -23,6 +24,7 @@ export function DataTable<TData>({
   table,
   columns,
 }: DataTableProps<TData>) {
+  const { t } = useTranslation();
   return (
     <div>
       <div className="rounded-md border">
@@ -62,7 +64,7 @@ export function DataTable<TData>({
             ) : (
               <TableRow>
                 <TableCell colSpan={columns.length} className="h-24 text-center">
-                  No results.
+                  {t('admin.data_table.no_results')}
                 </TableCell>
               </TableRow>
             )}
@@ -76,7 +78,7 @@ export function DataTable<TData>({
           onClick={() => table.previousPage()}
           disabled={!table.getCanPreviousPage()}
         >
-          Previous
+          {t('admin.data_table.previous')}
         </Button>
         <Button
           variant="outline"
@@ -84,7 +86,7 @@ export function DataTable<TData>({
           onClick={() => table.nextPage()}
           disabled={!table.getCanNextPage()}
         >
-          Next
+          {t('admin.data_table.next')}
         </Button>
       </div>
     </div>
