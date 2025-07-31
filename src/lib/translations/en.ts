@@ -36,7 +36,7 @@ export const en = {
   },
   search_page: {
     title: "Search GIFs",
-    results_for: 'Results for "{{query}}"',
+    results_for: "Results for {{query}}",
     gifs_found: "{{count}} GIF(s) found",
     no_results: "No GIFs found for your search. Try another term!",
   },
@@ -91,14 +91,14 @@ export const en = {
     title: "{{categoryName}} GIFs",
     meta_not_found: "Category Not Found",
     heading: "Category: {{categoryName}}",
-    description: 'Browsing all GIFs in the "{{categoryName}}" category.',
+    description: "Browsing all GIFs in the {{categoryName}} category.",
     no_gifs: "No GIFs found in this category yet."
   },
   tag_page: {
     title: "GIFs tagged #{{tagName}}",
     meta_not_found: "Tag Not Found",
     heading: "Tag: #{{tagName}}",
-    description: 'Browsing all GIFs tagged with "{{tagName}}".',
+    description: "Browsing all GIFs tagged with {{tagName}}.",
     no_gifs: "No GIFs found with this tag yet."
   },
   content_page: {
@@ -204,7 +204,7 @@ export const en = {
       form_meta_title: "Meta Title (for SEO)",
       form_meta_desc: "Meta Description (for SEO)",
       save_button: "Save {{sectionName}}",
-      toast_save_success: 'Content for "{{sectionName}}" saved successfully!',
+      toast_save_success: "Content for {{sectionName}} saved successfully!",
     },
     settings: {
       title: "Site Settings",
@@ -288,7 +288,7 @@ export const en = {
     },
     translation_dialog: {
       title: "Manage Translations",
-      description: 'Add or edit translations for "{{item}}" in different languages.',
+      description: "Add or edit translations for {{item}} in different languages.",
       save_button: "Save Translations",
     },
   },

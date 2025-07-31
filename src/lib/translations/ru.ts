@@ -36,7 +36,7 @@ export const ru = {
   },
   search_page: {
     title: "Поиск GIF",
-    results_for: 'Результаты для "{{query}}"',
+    results_for: "Результаты для {{query}}",
     gifs_found: "Найдено {{count}} GIF(ов)",
     no_results: "По вашему запросу ничего не найдено. Попробуйте другой термин!",
   },
@@ -91,14 +91,14 @@ export const ru = {
     title: "GIF-файлы {{categoryName}}",
     meta_not_found: "Категория не найдена",
     heading: "Категория: {{categoryName}}",
-    description: 'Просмотр всех GIF-файлов в категории "{{categoryName}}".',
+    description: "Просмотр всех GIF-файлов в категории {{categoryName}}.",
     no_gifs: "В этой категории пока нет GIF-файлов."
   },
   tag_page: {
     title: "GIF-файлы с тегом #{{tagName}}",
     meta_not_found: "Тег не найден",
     heading: "Тег: #{{tagName}}",
-    description: 'Просмотр всех GIF-файлов с тегом "{{tagName}}".',
+    description: "Просмотр всех GIF-файлов с тегом {{tagName}}.",
     no_gifs: "Пока нет GIF-файлов с этим тегом."
   },
   content_page: {
@@ -159,7 +159,7 @@ export const ru = {
       col_name: "Название (по умолч.)",
       col_slug: "Slug",
       delete_single_confirm: "Это действие необратимо. Категория будет удалена навсегда. Если у нее есть подкатегории, они станут категориями верхнего уровня.",
-      delete_many_confirm: "{count} категория(ий) будет(ут) удалена(ы) навсегда.",
+      delete_many_confirm: "{{count}} категория(ий) будет(ут) удалена(ы) навсегда.",
       toast_create_success: "Категория успешно создана!",
       toast_update_success: "Категория успешно обновлена!",
       toast_delete_success: "Категория успешно удалена!",
@@ -204,7 +204,7 @@ export const ru = {
       form_meta_title: "Мета-заголовок (для SEO)",
       form_meta_desc: "Мета-описание (для SEO)",
       save_button: "Сохранить {{sectionName}}",
-      toast_save_success: 'Контент для "{{sectionName}}" успешно сохранен!',
+      toast_save_success: "Контент для {{sectionName}} успешно сохранен!",
     },
     settings: {
       title: "Настройки сайта",
@@ -288,7 +288,7 @@ export const ru = {
     },
     translation_dialog: {
       title: "Управление переводами",
-      description: 'Добавьте или отредактируйте переводы для "{{item}}" на разных языках.',
+      description: "Добавьте или отредактируйте переводы для {{item}} на разных языках.",
       save_button: "Сохранить переводы",
     },
   },

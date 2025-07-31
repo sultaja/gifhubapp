@@ -36,7 +36,7 @@ export const az = {
   },
   search_page: {
     title: "GIF Axtar",
-    results_for: '"{{query}}" üçün nəticələr',
+    results_for: "{{query}} üçün nəticələr",
     gifs_found: "{{count}} GIF tapıldı",
     no_results: "Axtarışınız üçün GIF tapılmadı. Başqa bir termin yoxlayın!",
   },
@@ -91,14 +91,14 @@ export const az = {
     title: "{{categoryName}} GIF'ləri",
     meta_not_found: "Kateqoriya Tapılmadı",
     heading: "Kateqoriya: {{categoryName}}",
-    description: '"{{categoryName}}" kateqoriyasındakı bütün GIF\'lərə baxılır.',
+    description: "{{categoryName}} kateqoriyasındakı bütün GIF'lərə baxılır.",
     no_gifs: "Bu kateqoriyada hələ GIF tapılmadı."
   },
   tag_page: {
     title: "#{{tagName}} etiketli GIF'lər",
     meta_not_found: "Etiket Tapılmadı",
     heading: "Etiket: #{{tagName}}",
-    description: '"{{tagName}}" ilə etiketlənmiş bütün GIF\'lərə baxılır.',
+    description: "{{tagName}} ilə etiketlənmiş bütün GIF'lərə baxılır.",
     no_gifs: "Bu etiketlə hələ GIF tapılmadı."
   },
   content_page: {
@@ -204,7 +204,7 @@ export const az = {
       form_meta_title: "Meta Başlıq (SEO üçün)",
       form_meta_desc: "Meta Təsviri (SEO üçün)",
       save_button: "{{sectionName}} Yadda Saxla",
-      toast_save_success: '"{sectionName}}" üçün məzmun uğurla yadda saxlandı!',
+      toast_save_success: "{{sectionName}} üçün məzmun uğurla yadda saxlandı!",
     },
     settings: {
       title: "Sayt Parametrləri",
@@ -288,7 +288,7 @@ export const az = {
     },
     translation_dialog: {
       title: "Tərcümələri İdarə Et",
-      description: '"{{item}}" üçün fərqli dillərdə tərcümələr əlavə edin və ya redaktə edin.',
+      description: "{{item}} üçün fərqli dillərdə tərcümələr əlavə edin və ya redaktə edin.",
       save_button: "Tərcümələri Yadda Saxla",
     },
   },
