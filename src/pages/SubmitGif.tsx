@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -26,6 +26,7 @@ import { getCategories, getTags } from "@/services/api";
 import { showSuccess, showError, showLoading, dismissToast } from "@/utils/toast";
 import { Category, Tag } from "@/types";
 import { useTranslation } from "react-i18next";
+import { MultiSelectCombobox } from "@/components/ui/MultiSelectCombobox";
 
 const formSchema = z.object({
   title: z.string().min(3, "Title must be at least 3 characters long."),
@@ -50,6 +51,10 @@ const SubmitGifPage = () => {
     queryFn: getTags,
   });
 
+  const tagOptions = useMemo(() => {
+    return tags?.map(tag => ({ value: tag.id, label: tag.name })) || [];
+  }, [tags]);
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -59,7 +64,7 @@ const SubmitGifPage = () => {
     },
   });
 
-  const onSubmit = async (values: z.infer<typeof formSchema>) => {
+  const onSubmit = async (values: z.infer<typeof formSchema>>) => {
     setIsSubmitting(true);
     const toastId = showLoading(t('submit_page.toast.submitting'));
 
@@ -173,29 +178,14 @@ const SubmitGifPage = () => {
             render={({ field }) => (
               <FormItem>
                 <FormLabel>{t('submit_page.form.tags')}</FormLabel>
-                 <FormControl>
-                    <p className="text-sm text-muted-foreground mb-2">{t('submit_page.form.tags_placeholder')}</p>
-                 </FormControl>
-                <select
-                    multiple
-                    className="w-full p-2 border rounded-md bg-background h-32"
-                    value={field.value}
-                    onChange={(e) => {
-                        const options = [...e.target.selectedOptions];
-                        const values = options.map(option => option.value);
-                        field.onChange(values);
-                    }}
-                >
-                    {isLoadingTags ? (
-                        <option value="loading" disabled>{t('submit_page.form.loading')}</option>
-                    ) : (
-                        tags?.map((tag) => (
-                            <option key={tag.id} value={tag.id}>
-                                {tag.name}
-                            </option>
-                        ))
-                    )}
-                </select>
+                <FormControl>
+                  <MultiSelectCombobox
+                    options={tagOptions}
+                    selected={field.value}
+                    onChange={field.onChange}
+                    placeholder={isLoadingTags ? t('submit_page.form.loading') : "Select tags..."}
+                  />
+                </FormControl>
                 <FormMessage />
               </FormItem>
             )}

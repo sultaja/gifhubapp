@@ -30,10 +30,11 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { Gif, Category, Tag } from "@/types";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { getCategories, getTags } from "@/services/api";
 import { useTranslation } from "react-i18next";
+import { MultiSelectCombobox } from "@/components/ui/MultiSelectCombobox";
 
 const formSchema = z.object({
   title: z.string().min(3, "Title must be at least 3 characters long."),
@@ -73,6 +74,10 @@ export function GifDialog({ children, gif, onSave, isSaving }: GifDialogProps) {
     queryKey: ["tags"],
     queryFn: getTags,
   });
+
+  const tagOptions = useMemo(() => {
+    return tags?.map(tag => ({ value: tag.id, label: tag.name })) || [];
+  }, [tags]);
 
   const form = useForm<GifFormValues>({
     resolver: zodResolver(formSchema),
@@ -208,26 +213,12 @@ export function GifDialog({ children, gif, onSave, isSaving }: GifDialogProps) {
                 <FormItem>
                   <FormLabel>{t('admin.gif_dialog.tags')}</FormLabel>
                   <FormControl>
-                    <select
-                        multiple
-                        className="w-full p-2 border rounded-md bg-background h-32"
-                        value={field.value}
-                        onChange={(e) => {
-                            const options = [...e.target.selectedOptions];
-                            const values = options.map(option => option.value);
-                            field.onChange(values);
-                        }}
-                    >
-                        {isLoadingTags ? (
-                            <option value="loading" disabled>{t('submit_page.form.loading')}</option>
-                        ) : (
-                            tags?.map((tag) => (
-                                <option key={tag.id} value={tag.id}>
-                                    {tag.name}
-                                </option>
-                            ))
-                        )}
-                    </select>
+                    <MultiSelectCombobox
+                      options={tagOptions}
+                      selected={field.value}
+                      onChange={field.onChange}
+                      placeholder={isLoadingTags ? t('submit_page.form.loading') : "Select tags..."}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
