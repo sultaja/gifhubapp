@@ -40,7 +40,7 @@ export interface HierarchicalCategory extends Category {
 }
 
 export interface Gif {
-  id: string;
+  id:string;
   title: string;
   url: string;
   slug: string;
@@ -56,7 +56,7 @@ export interface SiteSettings {
     logo_url?: string | null;
     header_scripts?: string | null;
     footer_scripts?: string |null;
-    page_titles?: Record<string, string> | null;
+    page_titles?: Record<string, Record<string, string>> | null;
 }
 
 export interface ContentSection {

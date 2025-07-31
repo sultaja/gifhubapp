@@ -1,21 +1,24 @@
 import { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { useSiteSettings } from '@/contexts/SiteSettingsContext';
+import { useTranslation } from 'react-i18next';
 
 const PageMetadata = () => {
   const { settings, isLoading } = useSiteSettings();
   const location = useLocation();
+  const { i18n } = useTranslation();
 
   // Set page title
   useEffect(() => {
     if (!isLoading && settings?.page_titles) {
       const path = location.pathname;
-      const title = settings.page_titles[path];
+      const titlesForLang = (settings.page_titles as any)[i18n.language] || (settings.page_titles as any)['en'] || {};
+      const title = titlesForLang[path];
       if (title) {
         document.title = `${title} - GifHub.App`;
       }
     }
-  }, [location.pathname, settings, isLoading]);
+  }, [location.pathname, settings, isLoading, i18n.language]);
 
   // Inject header and footer scripts
   useEffect(() => {

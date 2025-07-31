@@ -12,12 +12,14 @@ import { showSuccess, showError } from "@/utils/toast";
 import { useEffect } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useTranslation } from "react-i18next";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { supportedLngs } from "@/i18n";
 
 const formSchema = z.object({
   logo_url: z.string().url().or(z.literal("")).optional(),
   header_scripts: z.string().optional(),
   footer_scripts: z.string().optional(),
-  page_titles: z.record(z.string()).optional(),
+  page_titles: z.record(z.record(z.string())).optional(),
 });
 
 type SettingsFormValues = z.infer<typeof formSchema>;
@@ -58,11 +60,15 @@ const AdminSettingsPage = () => {
 
   useEffect(() => {
     if (settings) {
+      const initialPageTitles: Record<string, Record<string, string>> = {};
+      for (const lang of Object.keys(supportedLngs)) {
+        initialPageTitles[lang] = (settings.page_titles as any)?.[lang] || {};
+      }
       form.reset({
         logo_url: settings.logo_url || "",
         header_scripts: settings.header_scripts || "",
         footer_scripts: settings.footer_scripts || "",
-        page_titles: settings.page_titles || {},
+        page_titles: initialPageTitles,
       });
     }
   }, [settings, form]);
@@ -113,23 +119,36 @@ const AdminSettingsPage = () => {
               <CardTitle>{t('admin.settings.seo_title')}</CardTitle>
               <CardDescription>{t('admin.settings.seo_desc')}</CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
-              {managedPages.map((page) => (
-                <FormField
-                  key={page.path}
-                  control={form.control}
-                  name={`page_titles.${page.path}`}
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{page.label} ({page.path})</FormLabel>
-                      <FormControl>
-                        <Input {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              ))}
+            <CardContent>
+              <Tabs defaultValue={Object.keys(supportedLngs)[0]} className="w-full">
+                <TabsList>
+                  {Object.entries(supportedLngs).map(([code, name]) => (
+                    <TabsTrigger key={code} value={code}>{name}</TabsTrigger>
+                  ))}
+                </TabsList>
+                {Object.keys(supportedLngs).map(code => (
+                  <TabsContent key={code} value={code}>
+                    <div className="space-y-4 p-1 mt-4">
+                      {managedPages.map((page) => (
+                        <FormField
+                          key={`${code}-${page.path}`}
+                          control={form.control}
+                          name={`page_titles.${code}.${page.path}`}
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>{page.label} ({page.path})</FormLabel>
+                              <FormControl>
+                                <Input {...field} value={field.value ?? ''} />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      ))}
+                    </div>
+                  </TabsContent>
+                ))}
+              </Tabs>
             </CardContent>
           </Card>
 
