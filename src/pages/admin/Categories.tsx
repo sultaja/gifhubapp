@@ -128,10 +128,9 @@ const AdminCategoriesPage = () => {
     if (categoryId) {
       updateMutation.mutate({ id: categoryId, values });
     } else {
-      const uniqueSlug = `${values.slug}-${Math.random().toString(36).substring(2, 7)}`;
       createMutation.mutate({
         name: values.name,
-        slug: uniqueSlug,
+        slug: values.slug,
         icon: values.icon,
         parent_id: values.parent_id || null,
         category_translations: [],

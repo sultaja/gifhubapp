@@ -80,6 +80,8 @@ export function CategoryDialog({ children, category, onSave, isSaving }: Categor
     },
   });
 
+  const { formState: { dirtyFields } } = form;
+
   useEffect(() => {
     if (category) {
       form.reset({ name: category.name, slug: category.slug, icon: category.icon || "", parent_id: category.parent_id });
@@ -90,10 +92,10 @@ export function CategoryDialog({ children, category, onSave, isSaving }: Categor
 
   const nameValue = form.watch("name");
   useEffect(() => {
-    if (!form.getValues("slug") || !category) {
-      form.setValue("slug", generateSlug(nameValue));
+    if (!dirtyFields.slug) {
+      form.setValue("slug", generateSlug(nameValue), { shouldValidate: true });
     }
-  }, [nameValue, form, category]);
+  }, [nameValue, dirtyFields.slug, form]);
 
   const handleSubmit = (values: z.infer<typeof formSchema>) => {
     onSave(values, category?.id);

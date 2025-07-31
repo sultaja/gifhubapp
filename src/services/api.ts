@@ -6,6 +6,13 @@ import { GifFormValues } from "@/components/admin/GifDialog";
 const BASE_GIF_QUERY = "id, title, url, slug, is_featured, gif_translations(*), category:categories(id, name, slug, icon, parent_id, category_translations(*)), tags(id, name, slug, tag_translations(*))";
 const BASE_CATEGORY_QUERY = "*, icon, parent_id, category_translations(*)";
 
+const handleDuplicateSlugError = (error: { message: string }, entity: string) => {
+  if (error.message.includes('duplicate key value violates unique constraint')) {
+    throw new Error(`A ${entity} with this slug already exists. Please choose a unique slug.`);
+  }
+  throw new Error(error.message);
+};
+
 // --- TRANSLATION API ---
 export const upsertCategoryTranslations = async (translations: Partial<CategoryTranslation>[]) => {
     const { error } = await supabase.from('category_translations').upsert(translations);
@@ -53,13 +60,13 @@ export const getHierarchicalCategories = async (): Promise<HierarchicalCategory[
 export const createCategory = async (category: Omit<Category, 'id'>): Promise<Category> => {
     const { category_translations, ...categoryDataForDb } = category;
     const { data, error } = await supabase.from('categories').insert(categoryDataForDb).select(BASE_CATEGORY_QUERY).single();
-    if (error) throw new Error(error.message);
+    if (error) handleDuplicateSlugError(error, 'category');
     return data;
 };
 
 export const updateCategory = async (id: string, updates: Partial<Category>): Promise<Category> => {
     const { data, error } = await supabase.from('categories').update(updates).eq('id', id).select(BASE_CATEGORY_QUERY).single();
-    if (error) throw new Error(error.message);
+    if (error) handleDuplicateSlugError(error, 'category');
     return data;
 };
 
@@ -84,13 +91,13 @@ export const getTags = async (): Promise<Tag[]> => {
 export const createTag = async (tag: Omit<Tag, 'id'>): Promise<Tag> => {
     const { tag_translations, ...tagDataForDb } = tag;
     const { data, error } = await supabase.from('tags').insert(tagDataForDb).select('*, tag_translations(*)').single();
-    if (error) throw new Error(error.message);
+    if (error) handleDuplicateSlugError(error, 'tag');
     return data;
 };
 
 export const updateTag = async (id: string, updates: Partial<Tag>): Promise<Tag> => {
     const { data, error } = await supabase.from('tags').update(updates).eq('id', id).select().single();
-    if (error) throw new Error(error.message);
+    if (error) handleDuplicateSlugError(error, 'tag');
     return data;
 };
 

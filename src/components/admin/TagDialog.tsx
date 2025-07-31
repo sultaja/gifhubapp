@@ -62,20 +62,22 @@ export function TagDialog({ children, tag, onSave, isSaving }: TagDialogProps) {
     },
   });
 
+  const { formState: { dirtyFields } } = form;
+
   useEffect(() => {
     if (tag) {
       form.reset({ name: tag.name, slug: tag.slug });
     } else {
       form.reset({ name: "", slug: "" });
     }
-  }, [tag, form]);
+  }, [tag, form, open]);
 
   const nameValue = form.watch("name");
   useEffect(() => {
-    if (!form.getValues("slug") || !tag) {
-      form.setValue("slug", generateSlug(nameValue));
+    if (!dirtyFields.slug) {
+      form.setValue("slug", generateSlug(nameValue), { shouldValidate: true });
     }
-  }, [nameValue, form, tag]);
+  }, [nameValue, dirtyFields.slug, form]);
 
   const handleSubmit = (values: z.infer<typeof formSchema>) => {
     onSave(values, tag?.id);
