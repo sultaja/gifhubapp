@@ -7,33 +7,45 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { showSuccess, showError } from "@/utils/toast";
 import { supportedLngs } from "@/i18n";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useMemo, useState } from "react";
+import { useEffect, useState } from "react";
+import { defaultTranslations } from "@/lib/default-translations";
+import { useTranslation } from "react-i18next";
 
 const AdminTranslationsPage = () => {
   const queryClient = useQueryClient();
+  const { t } = useTranslation();
   const [translations, setTranslations] = useState<Record<string, string>>({});
 
-  const { data, isLoading } = useQuery({
+  const { data: dbTranslations, isLoading } = useQuery({
     queryKey: ["uiTranslations"],
     queryFn: getUiTranslations,
-    onSuccess: (data) => {
+  });
+
+  useEffect(() => {
+    if (dbTranslations) {
       const initialTranslations: Record<string, string> = {};
       for (const lang of Object.keys(supportedLngs)) {
-        const t = data.find(d => d.lang_code === lang);
-        initialTranslations[lang] = t ? JSON.stringify(t.translations, null, 2) : "{}";
+        const dbLangData = dbTranslations.find(d => d.lang_code === lang);
+        if (dbLangData) {
+          initialTranslations[lang] = JSON.stringify(dbLangData.translations, null, 2);
+        } else {
+          // Fallback to default translations if not in DB
+          initialTranslations[lang] = JSON.stringify(defaultTranslations[lang as keyof typeof defaultTranslations] || {}, null, 2);
+        }
       }
       setTranslations(initialTranslations);
     }
-  });
+  }, [dbTranslations]);
 
   const mutation = useMutation({
     mutationFn: ({ lang, content }: { lang: string, content: object }) => upsertUiTranslation(lang, content),
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["uiTranslations"] });
-      showSuccess(`Translations for ${supportedLngs[data.lang_code as keyof typeof supportedLngs]} saved!`);
+      showSuccess(t('admin.translations.toast_save_success', { lang: supportedLngs[data.lang_code as keyof typeof supportedLngs] }));
     },
     onError: (error: Error) => {
-      showError(error.message);
+      showError(t('admin.translations.toast_json_error'));
+      console.error(error);
     },
   });
 
@@ -42,7 +54,7 @@ const AdminTranslationsPage = () => {
       const parsedContent = JSON.parse(translations[lang]);
       mutation.mutate({ lang, content: parsedContent });
     } catch (e) {
-      showError("Invalid JSON format. Please check your syntax.");
+      showError(t('admin.translations.toast_json_error'));
     }
   };
 
@@ -53,7 +65,7 @@ const AdminTranslationsPage = () => {
   if (isLoading) {
     return (
       <div>
-        <h1 className="text-3xl font-bold mb-6">UI Translations</h1>
+        <h1 className="text-3xl font-bold mb-6">{t('admin.translations.title')}</h1>
         <Skeleton className="w-full h-96" />
       </div>
     );
@@ -61,14 +73,11 @@ const AdminTranslationsPage = () => {
 
   return (
     <div>
-      <h1 className="text-3xl font-bold mb-6">UI Translations</h1>
+      <h1 className="text-3xl font-bold mb-6">{t('admin.translations.title')}</h1>
       <Card>
         <CardHeader>
-          <CardTitle>Edit UI Text</CardTitle>
-          <CardDescription>
-            Manage the text for buttons, labels, and other interface elements across the site.
-            Please use valid JSON format. You can copy the structure from the English (en) tab to get started.
-          </CardDescription>
+          <CardTitle>{t('admin.translations.page_title')}</CardTitle>
+          <CardDescription>{t('admin.translations.page_desc')}</CardDescription>
         </CardHeader>
         <CardContent>
           <Tabs defaultValue={Object.keys(supportedLngs)[0]} className="w-full">
@@ -87,7 +96,7 @@ const AdminTranslationsPage = () => {
                     placeholder={`{ "key": "value" }`}
                   />
                   <Button onClick={() => handleSave(code)} disabled={mutation.isPending}>
-                    {mutation.isPending ? "Saving..." : `Save ${supportedLngs[code as keyof typeof supportedLngs]} Translations`}
+                    {mutation.isPending ? t('admin.dialog_shared.saving') : t('admin.translations.save_button', { lang: supportedLngs[code as keyof typeof supportedLngs] })}
                   </Button>
                 </div>
               </TabsContent>
