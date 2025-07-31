@@ -40,6 +40,7 @@ const AdminCategoriesPage = () => {
   const mutationOptions = {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["adminCategories"] });
+      queryClient.invalidateQueries({ queryKey: ["hierarchicalCategories"] });
     },
     onError: (error: Error) => {
       showError(error.message);
@@ -47,7 +48,7 @@ const AdminCategoriesPage = () => {
   };
 
   const createMutation = useMutation({
-    mutationFn: (newCategory: Omit<Category, 'id' | 'category_translations'> & { category_translations: [] }) => createCategory(newCategory),
+    mutationFn: (newCategory: Omit<Category, 'id'>) => createCategory(newCategory),
     ...mutationOptions,
     onSuccess: () => {
       mutationOptions.onSuccess();
@@ -74,11 +75,15 @@ const AdminCategoriesPage = () => {
   });
 
   const handleSave = (values: CategoryFormValues, categoryId?: string) => {
+    const categoryData = {
+      ...values,
+      parent_id: values.parent_id || null,
+    };
+
     if (categoryId) {
-      updateMutation.mutate({ id: categoryId, values });
+      updateMutation.mutate({ id: categoryId, values: categoryData });
     } else {
-      // Add the required 'category_translations' property when creating a new category
-      createMutation.mutate({ ...values, category_translations: [] });
+      createMutation.mutate({ ...categoryData, category_translations: [] });
     }
   };
 
@@ -111,6 +116,15 @@ const AdminCategoriesPage = () => {
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       ),
+      cell: ({ row }) => {
+        const isSubCategory = !!row.original.parent_id;
+        return (
+          <span className={isSubCategory ? "pl-4" : ""}>
+            {isSubCategory && "↳ "}
+            {row.original.name}
+          </span>
+        );
+      },
     },
     {
       accessorKey: "slug",
@@ -163,7 +177,7 @@ const AdminCategoriesPage = () => {
                       <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
                       <AlertDialogDescription>
                         This action cannot be undone. This will permanently delete the
-                        category and may affect existing GIFs.
+                        category. If it has sub-categories, they will become top-level categories.
                       </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>

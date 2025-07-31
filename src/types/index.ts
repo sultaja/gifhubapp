@@ -31,7 +31,12 @@ export interface Category {
   name: string;
   slug: string;
   icon?: string;
+  parent_id: string | null;
   category_translations: CategoryTranslation[];
+}
+
+export interface HierarchicalCategory extends Category {
+  sub_categories: Category[];
 }
 
 export interface Gif {

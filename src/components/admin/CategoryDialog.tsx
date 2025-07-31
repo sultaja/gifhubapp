@@ -18,12 +18,21 @@ import {
   FormMessage,
   FormDescription,
 } from "@/components/ui/form";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { Category } from "@/types";
 import { useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { getCategories } from "@/services/api";
 
 const formSchema = z.object({
   name: z.string().min(2, {
@@ -33,6 +42,7 @@ const formSchema = z.object({
     message: "Slug must be at least 2 characters.",
   }),
   icon: z.string().optional(),
+  parent_id: z.string().nullable().optional(),
 });
 
 export type CategoryFormValues = z.infer<typeof formSchema>;
@@ -53,6 +63,10 @@ const generateSlug = (name: string) => {
 
 export function CategoryDialog({ children, category, onSave, isSaving }: CategoryDialogProps) {
   const [open, setOpen] = useState(false);
+  const { data: allCategories, isLoading: isLoadingCategories } = useQuery({
+    queryKey: ["adminCategories"],
+    queryFn: getCategories,
+  });
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -60,16 +74,17 @@ export function CategoryDialog({ children, category, onSave, isSaving }: Categor
       name: "",
       slug: "",
       icon: "",
+      parent_id: null,
     },
   });
 
   useEffect(() => {
     if (category) {
-      form.reset({ name: category.name, slug: category.slug, icon: category.icon || "" });
+      form.reset({ name: category.name, slug: category.slug, icon: category.icon || "", parent_id: category.parent_id });
     } else {
-      form.reset({ name: "", slug: "", icon: "" });
+      form.reset({ name: "", slug: "", icon: "", parent_id: null });
     }
-  }, [category, form]);
+  }, [category, form, open]);
 
   const nameValue = form.watch("name");
   useEffect(() => {
@@ -125,15 +140,47 @@ export function CategoryDialog({ children, category, onSave, isSaving }: Categor
             />
             <FormField
               control={form.control}
+              name="parent_id"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Parent Category</FormLabel>
+                  <Select onValueChange={(value) => field.onChange(value === "none" ? null : value)} value={field.value || "none"}>
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select a parent category" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value="none">None (Top-level)</SelectItem>
+                      {isLoadingCategories ? (
+                        <SelectItem value="loading" disabled>Loading...</SelectItem>
+                      ) : (
+                        allCategories?.filter(c => c.id !== category?.id).map((cat) => (
+                          <SelectItem key={cat.id} value={cat.id}>
+                            {cat.name}
+                          </SelectItem>
+                        ))
+                      )}
+                    </SelectContent>
+                  </Select>
+                  <FormDescription>
+                    Assign a parent to create a sub-category.
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
               name="icon"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Icon Name</FormLabel>
                   <FormControl>
-                    <Input placeholder="e.g., Rocket" {...field} />
+                    <Input placeholder="e.g., Rocket" {...field} value={field.value || ""} />
                   </FormControl>
                   <FormDescription>
-                    Enter a valid icon name from Lucide React.
+                    Enter a valid icon name from Lucide React. (For parent categories)
                   </FormDescription>
                   <FormMessage />
                 </FormItem>

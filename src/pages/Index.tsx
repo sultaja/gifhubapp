@@ -2,20 +2,30 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import GifCard from "@/components/GifCard";
 import { useQuery } from "@tanstack/react-query";
-import { getCategories, getLatestGifs, getFeaturedGifs } from "@/services/api";
+import { getHierarchicalCategories, getLatestGifs, getFeaturedGifs } from "@/services/api";
 import { Skeleton } from "@/components/ui/skeleton";
-import CategoryCard from "@/components/CategoryCard";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
+import DynamicIcon from "@/components/DynamicIcon";
+import { Badge } from "@/components/ui/badge";
+import { useTranslation } from "react-i18next";
+import { getTranslatedName } from "@/lib/translations";
 
 const Index = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const navigate = useNavigate();
+  const { i18n } = useTranslation();
 
   const { data: categories, isLoading: isLoadingCategories } = useQuery({
-    queryKey: ["categories"],
-    queryFn: getCategories,
+    queryKey: ["hierarchicalCategories"],
+    queryFn: getHierarchicalCategories,
   });
 
   const { data: latestGifs, isLoading: isLoadingLatestGifs } = useQuery({
@@ -79,16 +89,40 @@ const Index = () => {
 
       {/* Trending Categories */}
       <section className="py-12">
-        <h2 className="text-2xl font-bold mb-6 text-center">Trending Categories</h2>
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
-          {isLoadingCategories ? (
-            Array.from({ length: 6 }).map((_, i) => <Skeleton key={i} className="h-28 w-full rounded-lg" />)
-          ) : (
-            categories?.map((category) => (
-              <CategoryCard key={category.id} category={category} />
-            ))
-          )}
-        </div>
+        <h2 className="text-2xl font-bold mb-6 text-center">Browse by Category</h2>
+        {isLoadingCategories ? (
+          <div className="max-w-4xl mx-auto space-y-2">
+            {Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-14 w-full" />)}
+          </div>
+        ) : (
+          <Accordion type="multiple" className="w-full max-w-4xl mx-auto">
+            {categories?.map((category) => (
+              <AccordionItem value={category.id} key={category.id}>
+                <AccordionTrigger className="text-lg font-semibold hover:no-underline">
+                  <div className="flex items-center gap-3">
+                    <DynamicIcon name={category.icon || 'Folder'} className="h-6 w-6 text-primary" />
+                    {getTranslatedName(category, i18n.language, 'category_translations')}
+                  </div>
+                </AccordionTrigger>
+                <AccordionContent>
+                  <div className="p-4 flex flex-wrap gap-2">
+                    {category.sub_categories.length > 0 ? (
+                      category.sub_categories.map((sub) => (
+                        <Link key={sub.id} to={`/category/${sub.slug}`}>
+                          <Badge variant="outline" className="text-md py-1 px-3 hover:bg-accent">
+                            {getTranslatedName(sub, i18n.language, 'category_translations')}
+                          </Badge>
+                        </Link>
+                      ))
+                    ) : (
+                      <p className="text-muted-foreground text-sm">No sub-categories yet.</p>
+                    )}
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
+            ))}
+          </Accordion>
+        )}
       </section>
 
       {/* Latest GIFs */}

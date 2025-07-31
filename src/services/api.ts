@@ -1,9 +1,10 @@
 import { supabase } from "@/integrations/supabase/client";
-import { Gif, Category, Tag, SiteSettings, CategoryTranslation, TagTranslation, GifTranslation, ContentSection } from "@/types";
+import { Gif, Category, Tag, SiteSettings, CategoryTranslation, TagTranslation, GifTranslation, ContentSection, HierarchicalCategory } from "@/types";
 import { GifFormValues } from "@/components/admin/GifDialog";
 
 // The base query for fetching GIFs with their related category and tags, now including translations
-const BASE_GIF_QUERY = "id, title, url, slug, is_featured, gif_translations(*), category:categories(id, name, slug, icon, category_translations(*)), tags(id, name, slug, tag_translations(*))";
+const BASE_GIF_QUERY = "id, title, url, slug, is_featured, gif_translations(*), category:categories(id, name, slug, icon, parent_id, category_translations(*)), tags(id, name, slug, tag_translations(*))";
+const BASE_CATEGORY_QUERY = "*, icon, parent_id, category_translations(*)";
 
 // --- TRANSLATION API ---
 export const upsertCategoryTranslations = async (translations: Partial<CategoryTranslation>[]) => {
@@ -24,19 +25,39 @@ export const upsertGifTranslations = async (translations: Partial<GifTranslation
 
 // --- CATEGORY API ---
 export const getCategories = async (): Promise<Category[]> => {
-  const { data, error } = await supabase.from("categories").select("*, icon, category_translations(*)").order("name", { ascending: true });
+  const { data, error } = await supabase.from("categories").select(BASE_CATEGORY_QUERY).order("name", { ascending: true });
   if (error) throw new Error(error.message);
   return data || [];
 };
 
+export const getHierarchicalCategories = async (): Promise<HierarchicalCategory[]> => {
+  const { data, error } = await supabase.from("categories").select(BASE_CATEGORY_QUERY).order("name", { ascending: true });
+  if (error) throw new Error(error.message);
+  
+  const categories = data || [];
+  const categoryMap = new Map(categories.map(cat => [cat.id, { ...cat, sub_categories: [] }]));
+  const hierarchicalCategories: HierarchicalCategory[] = [];
+
+  for (const category of categories) {
+    const mappedCategory = categoryMap.get(category.id)!;
+    if (category.parent_id && categoryMap.has(category.parent_id)) {
+      categoryMap.get(category.parent_id)!.sub_categories.push(mappedCategory);
+    } else {
+      hierarchicalCategories.push(mappedCategory);
+    }
+  }
+  
+  return hierarchicalCategories;
+};
+
 export const createCategory = async (category: Omit<Category, 'id'>): Promise<Category> => {
-    const { data, error } = await supabase.from('categories').insert(category).select().single();
+    const { data, error } = await supabase.from('categories').insert(category).select(BASE_CATEGORY_QUERY).single();
     if (error) throw new Error(error.message);
     return data;
 };
 
 export const updateCategory = async (id: string, updates: Partial<Category>): Promise<Category> => {
-    const { data, error } = await supabase.from('categories').update(updates).eq('id', id).select().single();
+    const { data, error } = await supabase.from('categories').update(updates).eq('id', id).select(BASE_CATEGORY_QUERY).single();
     if (error) throw new Error(error.message);
     return data;
 };
@@ -192,7 +213,7 @@ export const getGifBySlug = async (slug: string): Promise<Gif | null> => {
 };
 
 export const getGifsByCategorySlug = async (slug: string): Promise<{ category: Category | null, gifs: Gif[] }> => {
-    const { data: category, error: categoryError } = await supabase.from('categories').select('*, icon, category_translations(*)').eq('slug', slug).single();
+    const { data: category, error: categoryError } = await supabase.from('categories').select(BASE_CATEGORY_QUERY).eq('slug', slug).single();
     if (categoryError || !category) {
         throw new Error(categoryError?.message || "Category not found");
     }
