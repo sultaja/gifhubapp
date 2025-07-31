@@ -42,6 +42,41 @@ const AdminCategoriesPage = () => {
     queryFn: getCategories,
   });
 
+  const processedCategories = React.useMemo(() => {
+    if (!categories) return [];
+
+    const parentCategories: Category[] = [];
+    const subCategoriesMap = new Map<string, Category[]>();
+
+    // Separate parent and sub-categories
+    categories.forEach(category => {
+      if (category.parent_id) {
+        if (!subCategoriesMap.has(category.parent_id)) {
+          subCategoriesMap.set(category.parent_id, []);
+        }
+        subCategoriesMap.get(category.parent_id)!.push(category);
+      } else {
+        parentCategories.push(category);
+      }
+    });
+
+    // Sort parent categories by name
+    parentCategories.sort((a, b) => a.name.localeCompare(b.name));
+
+    const result: Category[] = [];
+    parentCategories.forEach(parent => {
+      result.push(parent);
+      const children = subCategoriesMap.get(parent.id);
+      if (children) {
+        // Sort sub-categories by name
+        children.sort((a, b) => a.name.localeCompare(b.name));
+        result.push(...children);
+      }
+    });
+
+    return result;
+  }, [categories]);
+
   const mutationOptions = {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["adminCategories"] });
@@ -212,7 +247,7 @@ const AdminCategoriesPage = () => {
   ];
 
   const table = useReactTable({
-    data: categories || [],
+    data: processedCategories,
     columns,
     onSortingChange: setSorting,
     onRowSelectionChange: setRowSelection,
