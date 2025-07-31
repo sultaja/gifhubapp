@@ -1,8 +1,10 @@
 import { Link } from "react-router-dom";
 import { useSiteSettings } from "@/contexts/SiteSettingsContext";
+import { useTranslation } from "react-i18next";
 
 const Footer = () => {
   const { settings } = useSiteSettings();
+  const { t } = useTranslation();
 
   return (
     <footer className="border-t bg-background">
@@ -34,27 +36,27 @@ const Footer = () => {
                 rel="noreferrer"
                 className="font-medium underline underline-offset-4 hover:text-primary"
               >
-                GitHub
+                {t('footer.github')}
               </a>
               .
             </p>
           </div>
           <div className="grid grid-cols-2 gap-8 text-sm sm:grid-cols-3">
             <div className="flex flex-col space-y-2">
-              <h4 className="font-semibold">Company</h4>
-              <Link to="/about" className="text-muted-foreground hover:text-primary hover:underline">About</Link>
-              <Link to="/contact" className="text-muted-foreground hover:text-primary hover:underline">Contact</Link>
-              <Link to="/advertise" className="text-muted-foreground hover:text-primary hover:underline">Advertise</Link>
+              <h4 className="font-semibold">{t('footer.company')}</h4>
+              <Link to="/about" className="text-muted-foreground hover:text-primary hover:underline">{t('footer.about')}</Link>
+              <Link to="/contact" className="text-muted-foreground hover:text-primary hover:underline">{t('footer.contact')}</Link>
+              <Link to="/advertise" className="text-muted-foreground hover:text-primary hover:underline">{t('footer.advertise')}</Link>
             </div>
             <div className="flex flex-col space-y-2">
-              <h4 className="font-semibold">Legal</h4>
-              <Link to="/privacy-policy" className="text-muted-foreground hover:text-primary hover:underline">Privacy</Link>
-              <Link to="/terms-of-service" className="text-muted-foreground hover:text-primary hover:underline">Terms</Link>
+              <h4 className="font-semibold">{t('footer.legal')}</h4>
+              <Link to="/privacy-policy" className="text-muted-foreground hover:text-primary hover:underline">{t('footer.privacy')}</Link>
+              <Link to="/terms-of-service" className="text-muted-foreground hover:text-primary hover:underline">{t('footer.terms')}</Link>
             </div>
              <div className="flex flex-col space-y-2">
-              <h4 className="font-semibold">Community</h4>
-              <Link to="/submit" className="text-muted-foreground hover:text-primary hover:underline">Submit a GIF</Link>
-              <a href="#" target="_blank" rel="noreferrer" className="text-muted-foreground hover:text-primary hover:underline">GitHub</a>
+              <h4 className="font-semibold">{t('footer.community')}</h4>
+              <Link to="/submit" className="text-muted-foreground hover:text-primary hover:underline">{t('header.submit_gif')}</Link>
+              <a href="#" target="_blank" rel="noreferrer" className="text-muted-foreground hover:text-primary hover:underline">{t('footer.github')}</a>
             </div>
           </div>
         </div>

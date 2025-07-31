@@ -3,9 +3,12 @@ import { Button } from "@/components/ui/button";
 import { ModeToggle } from "@/components/ModeToggle";
 import { Upload } from "lucide-react";
 import { useSiteSettings } from "@/contexts/SiteSettingsContext";
+import { LanguageSwitcher } from "@/components/LanguageSwitcher";
+import { useTranslation } from "react-i18next";
 
 const Header = () => {
   const { settings } = useSiteSettings();
+  const { t } = useTranslation();
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -22,9 +25,10 @@ const Header = () => {
         <div className="flex flex-1 items-center justify-end space-x-2">
           <Button asChild>
             <Link to="/submit">
-              <Upload className="mr-2 h-4 w-4" /> Submit a GIF
+              <Upload className="mr-2 h-4 w-4" /> {t('header.submit_gif')}
             </Link>
           </Button>
+          <LanguageSwitcher />
           <ModeToggle />
         </div>
       </div>

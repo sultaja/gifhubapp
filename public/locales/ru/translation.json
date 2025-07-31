@@ -1,0 +1,19 @@
+{
+  "header": {
+    "submit_gif": "Отправить GIF"
+  },
+  "footer": {
+    "company": "Компания",
+    "about": "О нас",
+    "contact": "Контакты",
+    "advertise": "Реклама",
+    "legal": "Правовая информация",
+    "privacy": "Конфиденциальность",
+    "terms": "Условия",
+    "community": "Сообщество",
+    "github": "GitHub"
+  },
+  "language_switcher": {
+    "change_language": "Сменить язык"
+  }
+}

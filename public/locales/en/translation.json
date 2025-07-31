@@ -1,0 +1,19 @@
+{
+  "header": {
+    "submit_gif": "Submit a GIF"
+  },
+  "footer": {
+    "company": "Company",
+    "about": "About",
+    "contact": "Contact",
+    "advertise": "Advertise",
+    "legal": "Legal",
+    "privacy": "Privacy",
+    "terms": "Terms",
+    "community": "Community",
+    "github": "GitHub"
+  },
+  "language_switcher": {
+    "change_language": "Change language"
+  }
+}
