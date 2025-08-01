@@ -26,39 +26,34 @@ const PageMetadata = () => {
       return;
     }
 
-    const injectScripts = (scriptHTML: string, containerId: string, targetElement: HTMLElement) => {
+    const injectContent = (htmlContent: string, containerId: string, targetElement: HTMLElement) => {
       const markerAttr = `data-dyad-script-${containerId}`;
 
-      // Clean up previous scripts from this source to prevent duplicates on re-render
+      // Clean up previous content from this source
       document.querySelectorAll(`[${markerAttr}]`).forEach(el => el.remove());
 
-      const container = document.createElement('div');
-      container.innerHTML = scriptHTML;
+      if (!htmlContent || !htmlContent.trim()) {
+        return;
+      }
 
-      // Re-create script elements to ensure they are executed by the browser
-      container.querySelectorAll('script').forEach(oldScript => {
-        const newScript = document.createElement('script');
-        Array.from(oldScript.attributes).forEach(attr => {
-          newScript.setAttribute(attr.name, attr.value);
-        });
-        newScript.appendChild(document.createTextNode(oldScript.innerHTML));
-        oldScript.parentNode?.replaceChild(newScript, oldScript);
-      });
-
-      // Append all nodes from the container to the target element (head or body)
-      // and add a marker attribute for cleanup on the next run.
-      Array.from(container.children).forEach(child => {
+      // Use a DocumentFragment to parse and inject the HTML.
+      // This is safer and more reliable than innerHTML for this use case.
+      const fragment = document.createRange().createContextualFragment(htmlContent);
+      
+      // Mark all injected elements for future cleanup
+      Array.from(fragment.children).forEach(child => {
         child.setAttribute(markerAttr, 'true');
-        targetElement.appendChild(child);
       });
+
+      targetElement.appendChild(fragment);
     };
 
     if (settings.header_scripts) {
-      injectScripts(settings.header_scripts, 'header', document.head);
+      injectContent(settings.header_scripts, 'header', document.head);
     }
 
     if (settings.footer_scripts) {
-      injectScripts(settings.footer_scripts, 'footer', document.body);
+      injectContent(settings.footer_scripts, 'footer', document.body);
     }
 
   }, [settings, isLoading]);
