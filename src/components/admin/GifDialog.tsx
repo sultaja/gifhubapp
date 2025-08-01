@@ -36,6 +36,8 @@ import { useQuery } from "@tanstack/react-query";
 import { getCategories } from "@/services/api";
 import { useTranslation } from "react-i18next";
 import { createSlug } from "@/utils/slug";
+import { GiphySelector } from "./GiphySelector";
+import { Search } from "lucide-react";
 
 const formSchema = z.object({
   title: z.string().min(3, "Title must be at least 3 characters long."),
@@ -58,6 +60,7 @@ interface GifDialogProps {
 export function GifDialog({ children, gif, onSave, isSaving }: GifDialogProps) {
   const { t } = useTranslation();
   const [open, setOpen] = useState(false);
+  const [isGiphySelectorOpen, setIsGiphySelectorOpen] = useState(false);
 
   const { data: categories, isLoading: isLoadingCategories } = useQuery<Category[]>({
     queryKey: ["categories"],
@@ -110,6 +113,10 @@ export function GifDialog({ children, gif, onSave, isSaving }: GifDialogProps) {
     setOpen(false);
   };
 
+  const handleGiphySelect = (url: string) => {
+    form.setValue("url", url, { shouldValidate: true, shouldDirty: true });
+  };
+
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>{children}</DialogTrigger>
@@ -156,9 +163,14 @@ export function GifDialog({ children, gif, onSave, isSaving }: GifDialogProps) {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>{t('admin.gif_dialog.url')}</FormLabel>
-                  <FormControl>
-                    <Input placeholder="https://media.giphy.com/..." {...field} />
-                  </FormControl>
+                  <div className="flex items-center space-x-2">
+                    <FormControl>
+                      <Input placeholder="https://media.giphy.com/..." {...field} />
+                    </FormControl>
+                    <Button type="button" variant="outline" onClick={() => setIsGiphySelectorOpen(true)}>
+                      <Search className="h-4 w-4" />
+                    </Button>
+                  </div>
                   <FormMessage />
                 </FormItem>
               )}
@@ -237,6 +249,11 @@ export function GifDialog({ children, gif, onSave, isSaving }: GifDialogProps) {
             </DialogFooter>
           </form>
         </Form>
+        <GiphySelector
+          open={isGiphySelectorOpen}
+          onOpenChange={setIsGiphySelectorOpen}
+          onSelect={handleGiphySelect}
+        />
       </DialogContent>
     </Dialog>
   );
