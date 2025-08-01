@@ -100,6 +100,7 @@ const GifPage = () => {
 
   const pageUrl = window.location.href;
   const markdownLink = `[![${title}](${gif.url})](${pageUrl})`;
+  const isGiphyGif = gif.url.includes("giphy.com");
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -110,6 +111,18 @@ const GifPage = () => {
             alt={title}
             className="w-full h-auto rounded-lg border"
           />
+          {isGiphyGif && (
+            <div className="text-right mt-2">
+              <a 
+                href="https://giphy.com/" 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                className="text-xs text-muted-foreground hover:text-primary"
+              >
+                Powered by GIPHY
+              </a>
+            </div>
+          )}
         </div>
         <div>
           <Card>
