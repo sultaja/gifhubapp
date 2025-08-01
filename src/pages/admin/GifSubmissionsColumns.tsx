@@ -3,8 +3,8 @@ import { Gif } from "@/types";
 import { Badge } from "@/components/ui/badge";
 import { formatDistanceToNow } from "date-fns";
 import { useTranslation } from "react-i18next";
-import { useQueryClient } from "@tanstack/react-query";
-import { useSaveGif, useDeleteGif } from "@/hooks/useAdminGifs";
+import { useQueryClient, useMutation } from "@tanstack/react-query";
+import { updateGif, deleteGif } from "@/services/api";
 import { GifDialog, GifFormValues } from "@/components/admin/GifDialog";
 import { Button } from "@/components/ui/button";
 import { showSuccess, showError } from "@/utils/toast";
@@ -25,36 +25,40 @@ const ActionsCell = ({ row }: { row: any }) => {
   const { t } = useTranslation();
   const queryClient = useQueryClient();
 
-  const saveGifMutation = useSaveGif();
-  const deleteGifMutation = useDeleteGif();
-
-  const handleApprove = (values: GifFormValues, gifId?: string) => {
-    const payload = {
-      ...values,
-      id: gifId,
-      is_approved: true,
-    };
-    saveGifMutation.mutate(payload, {
-      onSuccess: () => {
+  const updateMutation = useMutation({
+    mutationFn: ({ id, values }: { id: string, values: Partial<Gif> }) => updateGif(id, values),
+    onSuccess: () => {
         showSuccess(t("admin.gif_submissions.toast.approved"));
         queryClient.invalidateQueries({ queryKey: ["pendingGifs"] });
-        queryClient.invalidateQueries({ queryKey: ["gifs"] });
-      },
-      onError: (error) => {
+        queryClient.invalidateQueries({ queryKey: ["adminGifs"] });
+    },
+    onError: (error: Error) => {
         showError(error.message || t("admin.gif_submissions.toast.error_approve"));
-      },
-    });
+    },
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: (id: string) => deleteGif(id),
+    onSuccess: () => {
+        showSuccess(t("admin.gif_submissions.toast.rejected"));
+        queryClient.invalidateQueries({ queryKey: ["pendingGifs"] });
+    },
+    onError: (error: Error) => {
+        showError(error.message || t("admin.gif_submissions.toast.error_reject"));
+    },
+  });
+
+  const handleApprove = (values: GifFormValues, gifId?: string) => {
+    if (!gifId) return;
+    const payload = {
+      ...values,
+      is_approved: true,
+    };
+    updateMutation.mutate({ id: gifId, values: payload as Partial<Gif> });
   };
 
   const handleReject = () => {
-    deleteGifMutation.mutate(gif.id, {
-      onSuccess: () => {
-        showSuccess(t("admin.gif_submissions.toast.rejected"));
-      },
-      onError: (error) => {
-        showError(error.message || t("admin.gif_submissions.toast.error_reject"));
-      },
-    });
+    deleteMutation.mutate(gif.id);
   };
 
   return (
@@ -62,7 +66,7 @@ const ActionsCell = ({ row }: { row: any }) => {
       <GifDialog
         gif={gif}
         onSave={handleApprove}
-        isSaving={saveGifMutation.isPending}
+        isSaving={updateMutation.isPending}
       >
         <Button variant="outline" size="sm">
           {t("admin.gif_submissions.approve_button")}
@@ -73,7 +77,7 @@ const ActionsCell = ({ row }: { row: any }) => {
             <Button
                 variant="destructive"
                 size="sm"
-                disabled={deleteGifMutation.isPending}
+                disabled={deleteMutation.isPending}
             >
                 {t("admin.gif_submissions.reject_button")}
             </Button>
