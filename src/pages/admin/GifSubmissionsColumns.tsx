@@ -3,11 +3,9 @@ import { Gif } from "@/types";
 import { Badge } from "@/components/ui/badge";
 import { formatDistanceToNow } from "date-fns";
 import { useTranslation } from "react-i18next";
-import { useQueryClient, useMutation } from "@tanstack/react-query";
-import { updateGif, deleteGif } from "@/services/api";
+import { useApproveGif, useRejectGif } from "@/hooks/useAdminGifs";
 import { GifDialog, GifFormValues } from "@/components/admin/GifDialog";
 import { Button } from "@/components/ui/button";
-import { showSuccess, showError } from "@/utils/toast";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -23,30 +21,9 @@ import {
 const ActionsCell = ({ row }: { row: any }) => {
   const gif = row.original as Gif;
   const { t } = useTranslation();
-  const queryClient = useQueryClient();
-
-  const updateMutation = useMutation({
-    mutationFn: ({ id, values }: { id: string, values: Partial<Gif> }) => updateGif(id, values),
-    onSuccess: () => {
-        showSuccess(t("admin.gif_submissions.toast.approved"));
-        queryClient.invalidateQueries({ queryKey: ["pendingGifs"] });
-        queryClient.invalidateQueries({ queryKey: ["adminGifs"] });
-    },
-    onError: (error: Error) => {
-        showError(error.message || t("admin.gif_submissions.toast.error_approve"));
-    },
-  });
-
-  const deleteMutation = useMutation({
-    mutationFn: (id: string) => deleteGif(id),
-    onSuccess: () => {
-        showSuccess(t("admin.gif_submissions.toast.rejected"));
-        queryClient.invalidateQueries({ queryKey: ["pendingGifs"] });
-    },
-    onError: (error: Error) => {
-        showError(error.message || t("admin.gif_submissions.toast.error_reject"));
-    },
-  });
+  
+  const approveMutation = useApproveGif();
+  const rejectMutation = useRejectGif();
 
   const handleApprove = (values: GifFormValues, gifId?: string) => {
     if (!gifId) return;
@@ -54,11 +31,11 @@ const ActionsCell = ({ row }: { row: any }) => {
       ...values,
       is_approved: true,
     };
-    updateMutation.mutate({ id: gifId, values: payload as Partial<Gif> });
+    approveMutation.mutate({ id: gifId, values: payload as Partial<Gif> });
   };
 
   const handleReject = () => {
-    deleteMutation.mutate(gif.id);
+    rejectMutation.mutate(gif.id);
   };
 
   return (
@@ -66,7 +43,7 @@ const ActionsCell = ({ row }: { row: any }) => {
       <GifDialog
         gif={gif}
         onSave={handleApprove}
-        isSaving={updateMutation.isPending}
+        isSaving={approveMutation.isPending}
       >
         <Button variant="outline" size="sm">
           {t("admin.gif_submissions.approve_button")}
@@ -77,7 +54,7 @@ const ActionsCell = ({ row }: { row: any }) => {
             <Button
                 variant="destructive"
                 size="sm"
-                disabled={deleteMutation.isPending}
+                disabled={rejectMutation.isPending}
             >
                 {t("admin.gif_submissions.reject_button")}
             </Button>
