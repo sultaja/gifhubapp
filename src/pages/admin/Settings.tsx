@@ -93,6 +93,36 @@ const AdminSettingsPage = () => {
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
           <Card>
             <CardHeader>
+              <CardTitle>{t('admin.settings.verification_title')}</CardTitle>
+              <CardDescription>
+                {t('admin.settings.verification_desc')}
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <p className="text-sm font-medium mb-2">{t('admin.settings.verification_file')}</p>
+              <div className="bg-muted rounded-md p-4 text-sm text-muted-foreground overflow-x-auto">
+                <pre>
+                  <code>
+{`<!doctype html>
+<html lang="en">
+  <head>
+    ...
+    <meta property="twitter:image" content="/placeholder.svg">
+
+    <!-- PASTE YOUR VERIFICATION TAGS (e.g., Google Search Console) HERE -->
+
+    <meta name="theme-color" content="#ffffff">
+  </head>
+  ...
+</html>`}
+                  </code>
+                </pre>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
               <CardTitle>{t('admin.settings.branding_title')}</CardTitle>
               <CardDescription>{t('admin.settings.branding_desc')}</CardDescription>
             </CardHeader>
