@@ -17,7 +17,7 @@ const mapGifData = (gif: any): Gif => {
   const mapped = {
     ...gif,
     category: gif.categories || null,
-    tags: gif.gif_tags?.map((gt: any) => gt.tags).filter(Boolean).map((t: any) => ({ ...t, tag_translations: [] })) || [],
+    tags: gif.gif_tags?.map((gt: any) => gt.tags).filter(Boolean) || [],
     gif_translations: gif.gif_translations || [],
   };
   delete mapped.categories;
@@ -25,10 +25,14 @@ const mapGifData = (gif: any): Gif => {
   return mapped;
 };
 
+const gifSelectQuery = '*, categories(*, category_translations(*)), gif_tags(tags(*, tag_translations(*))), gif_translations(*)';
+const gifByCategorySelectQuery = '*, categories!inner(*, category_translations(*)), gif_tags(tags(*, tag_translations(*))), gif_translations(*)';
+const gifByTagSelectQuery = 'gifs!inner(*, categories(*, category_translations(*)), gif_tags(tags(*, tag_translations(*))), gif_translations(*))';
+
 export const getGifs = async (): Promise<Gif[]> => {
   const { data, error } = await supabase
     .from("gifs")
-    .select('*, categories(*, category_translations(*)), gif_tags(tags(*)), gif_translations(*)')
+    .select(gifSelectQuery)
     .order("created_at", { ascending: false });
 
   if (error) throw new Error(error.message);
@@ -38,7 +42,7 @@ export const getGifs = async (): Promise<Gif[]> => {
 export const getPendingGifs = async (): Promise<Gif[]> => {
   const { data, error } = await supabase
     .from("gifs")
-    .select('*, categories(*, category_translations(*)), gif_tags(tags(*)), gif_translations(*)')
+    .select(gifSelectQuery)
     .eq('is_approved', false)
     .order("created_at", { ascending: true });
 
@@ -49,7 +53,7 @@ export const getPendingGifs = async (): Promise<Gif[]> => {
 export const getLatestGifs = async (limit: number = 12): Promise<Gif[]> => {
   const { data, error } = await supabase
     .from("gifs")
-    .select('*, categories(*, category_translations(*)), gif_tags(tags(*)), gif_translations(*)')
+    .select(gifSelectQuery)
     .eq('is_approved', true)
     .order("created_at", { ascending: false })
     .limit(limit);
@@ -61,7 +65,7 @@ export const getLatestGifs = async (limit: number = 12): Promise<Gif[]> => {
 export const getFeaturedGifs = async (limit: number = 8): Promise<Gif[]> => {
   const { data, error } = await supabase
     .from("gifs")
-    .select('*, categories(*, category_translations(*)), gif_tags(tags(*)), gif_translations(*)')
+    .select(gifSelectQuery)
     .eq("is_featured", true)
     .eq('is_approved', true)
     .order("created_at", { ascending: false })
@@ -74,7 +78,7 @@ export const getFeaturedGifs = async (limit: number = 8): Promise<Gif[]> => {
 export const getGifBySlug = async (slug: string): Promise<Gif> => {
   const { data, error } = await supabase
     .from("gifs")
-    .select('*, categories(*, category_translations(*)), gif_tags(tags(*)), gif_translations(*)')
+    .select(gifSelectQuery)
     .eq("slug", slug)
     .eq('is_approved', true)
     .single();
@@ -104,7 +108,7 @@ export const getGifsByCategorySlug = async (slug: string) => {
 
   const { data: gifs, error: gifsError } = await supabase
     .from('gifs')
-    .select('*, categories!inner(*, category_translations(*)), gif_tags(tags(*)), gif_translations(*)')
+    .select(gifByCategorySelectQuery)
     .in('category_id', categoryIds)
     .eq('is_approved', true)
     .order('created_at', { ascending: false });
@@ -126,7 +130,7 @@ export const getGifsByTagSlug = async (slug: string) => {
 
   const { data, error: gifsError } = await supabase
     .from('gif_tags')
-    .select('gifs!inner(*, categories(*, category_translations(*)), gif_tags(tags(*)), gif_translations(*))')
+    .select(gifByTagSelectQuery)
     .eq('tag_id', tag.id)
     .eq('gifs.is_approved', true);
 
@@ -147,7 +151,7 @@ export const searchGifs = async (searchTerm: string): Promise<Gif[]> => {
 
   const { data: gifs, error: gifsError } = await supabase
     .from('gifs')
-    .select('*, categories(*, category_translations(*)), gif_tags(tags(*)), gif_translations(*)')
+    .select(gifSelectQuery)
     .in('id', gifIds)
     .eq('is_approved', true);
 
