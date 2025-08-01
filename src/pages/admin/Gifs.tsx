@@ -55,7 +55,7 @@ const AdminGifsPage = () => {
   };
 
   const createMutation = useMutation({
-    mutationFn: (newGif: GifFormValues) => createGif(newGif),
+    mutationFn: (newGif: GifFormValues & { is_approved?: boolean }) => createGif(newGif),
     ...mutationOptions,
     onSuccess: () => {
       mutationOptions.onSuccess();
@@ -94,7 +94,7 @@ const AdminGifsPage = () => {
     if (gifId) {
       updateMutation.mutate({ id: gifId, values });
     } else {
-      createMutation.mutate(values);
+      createMutation.mutate({ ...values, is_approved: true });
     }
   };
 
