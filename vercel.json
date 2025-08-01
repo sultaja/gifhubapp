@@ -1,8 +1,8 @@
 {
   "rewrites": [
     {
-      "source": "/((?!api/|.*\\..*).*)",
-      "destination": "/index.html"
+      "source": "/sitemap.xml",
+      "destination": "https://adkeofgstlxdrfsffciu.supabase.co/functions/v1/sitemap"
     }
   ]
 }
