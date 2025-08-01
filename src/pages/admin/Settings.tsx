@@ -195,7 +195,7 @@ const AdminSettingsPage = () => {
                   <FormItem>
                     <FormLabel>{t('admin.settings.header_scripts')}</FormLabel>
                     <FormControl>
-                      <Textarea placeholder="<style>...</style> or <script>...</script>" {...field} value={field.value ?? ""} rows={5} />
+                      <Textarea placeholder="<script>...</script>" {...field} value={field.value ?? ""} rows={5} />
                     </FormControl>
                     <FormDescription>{t('admin.settings.header_scripts_desc')}</FormDescription>
                     <FormMessage />
@@ -209,7 +209,7 @@ const AdminSettingsPage = () => {
                   <FormItem>
                     <FormLabel>{t('admin.settings.footer_scripts')}</FormLabel>
                     <FormControl>
-                      <Textarea placeholder="<script>...</script> for analytics, etc." {...field} value={field.value ?? ""} rows={5} />
+                      <Textarea placeholder="<script>...</script>" {...field} value={field.value ?? ""} rows={5} />
                     </FormControl>
                     <FormDescription>{t('admin.settings.footer_scripts_desc')}</FormDescription>
                     <FormMessage />
